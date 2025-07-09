@@ -30,7 +30,6 @@ type LoginResponse {
 
 type Query {
   check: String!
-  me: String!
 }
 
 type Mutation {

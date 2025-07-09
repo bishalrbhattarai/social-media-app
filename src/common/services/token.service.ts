@@ -1,11 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Jwt } from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface JwtPayload {
   sub: string;
   email: string;
+  iat?: number;
+  exp?: number;
+  jti?: string;
 }
+
 @Injectable()
 export class TokenService {
   constructor(private readonly jwtService: JwtService) {}
@@ -20,9 +25,15 @@ export class TokenService {
     return { token, jti: accessTokenJti };
   }
 
-  async verifyAccessToken(token: string) {
+  verifyAccessToken(token: string): JwtPayload {
     return this.jwtService.verify(token, {
       secret: 'your-access-token-secret',
+    });
+  }
+
+  verifyRefreshToken(token: string): JwtPayload {
+    return this.jwtService.verify(token, {
+      secret: 'your-refresh-token-secret',
     });
   }
 

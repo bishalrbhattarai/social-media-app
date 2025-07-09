@@ -13,8 +13,10 @@ import { RegisterResponse } from '../response/register-response';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { TokenService } from 'src/common/services/token.service';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { LoginResponse } from '../response/login-response';
+import { JwtPayload } from 'jsonwebtoken';
+import { RefreshTokenResponse } from '../response/refresh-token-response';
 
 @Injectable()
 export class AuthService {
@@ -25,8 +27,40 @@ export class AuthService {
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
-  async validateToken(token: string) {
+  async refreshAccessToken(
+    req: Request,
+    res: Response,
+  ): Promise<RefreshTokenResponse> {
+    const refreshToken = req.cookies['refresh_token'];
+    if (!refreshToken)
+      throw new BadRequestException('Refresh token is missing');
+    const decoded = this.tokenService.verifyRefreshToken(refreshToken);
+    if (!decoded) throw new BadRequestException('Invalid refresh token');
+    const value = await this.cacheManager.get(`refresh-token:${decoded.jti}`);
+    if (!value) throw new BadRequestException('Refresh token not found');
 
+    const { token, jti: accessTokenJti } =
+      this.tokenService.generateAccessToken({
+        sub: decoded.sub,
+        email: decoded.email,
+      });
+
+    await this.cacheManager.set(
+      `access-token:${accessTokenJti}`,
+      token,
+      15 * 60,
+    );
+
+    return {
+      message: 'Access token refreshed successfully',
+      accessToken: token,
+    };
+  }
+
+  async validateToken(token: string) {
+    const decoded = this.tokenService.verifyAccessToken(token);
+    const value = await this.cacheManager.get(`access-token:${decoded.jti}`);
+    console.log(`the value from the cache is: ${value}`);
   }
 
   async login(input: LoginUserInput, res: Response): Promise<LoginResponse> {
@@ -56,16 +90,24 @@ export class AuthService {
       secure: false,
     });
 
-    await this.cacheManager.set(
-      `access-token:${accessJti}`,
-      accessToken,
-      15 * 60,
-    ); // 15 mins
+    try {
+      await this.cacheManager.set(
+        `access-token:${accessJti}`,
+        accessToken,
+        15 * 60,
+      );
+      console.log(`Successfully set access token: access-token:${accessJti}`);
+
+      const fetchData = await this.cacheManager.get(`bishal`);
+      console.log(`Fetched data from cache: ${fetchData}`);
+    } catch (error) {
+      console.error('Error setting access token:', error);
+    }
     await this.cacheManager.set(
       `refresh-token:${refreshJti}`,
       refreshToken,
       7 * 24 * 60 * 60,
-    ); // 7 days
+    );
 
     return {
       message: 'Login successful',

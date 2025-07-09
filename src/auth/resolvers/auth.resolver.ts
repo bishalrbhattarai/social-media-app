@@ -4,6 +4,7 @@ import { AuthService } from '../services/auth.service';
 import { RegisterResponse } from '../response/register-response';
 import { LoginResponse } from '../response/login-response';
 import { Request, Response } from 'express';
+import { RefreshTokenResponse } from '../response/refresh-token-response';
 
 interface GqlContext {
   req: Request;
@@ -19,11 +20,10 @@ export class AuthResolver {
     return this.authService.register(input);
   }
 
-  @Query(() => String)
-  me(@Context() { req }: GqlContext) {
-    const token = req.headers.authorization;
-    this.authService.validateToken(token);
-    return 'me query resolver is running';
+  refreshAccessToken(
+    @Context() { req, res }: GqlContext,
+  ): Promise<RefreshTokenResponse> {
+    return this.authService.refreshAccessToken(req, res);
   }
 
   @Mutation(() => LoginResponse)
