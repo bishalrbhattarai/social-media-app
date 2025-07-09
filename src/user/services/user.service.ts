@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from '../repositories/user.repository';
 import { UserDocument } from '../entities/user.schema';
+import { CreateUserInput } from 'src/auth/dtos/auth.dto';
 
 @Injectable()
 export class UserService {
@@ -8,5 +9,9 @@ export class UserService {
 
   async findOneByEmail(email: string): Promise<UserDocument | null> {
     return this.userRepository.findOne({ email });
+  }
+
+  async createUser(input: CreateUserInput): Promise<UserDocument> {
+    return this.userRepository.create(input);
   }
 }

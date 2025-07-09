@@ -11,7 +11,7 @@ export class User {
   @Prop()
   name: string;
 
-  @Prop({unique: true}) 
+  @Prop({ unique: true })
   email: string;
 
   @Prop()
@@ -26,7 +26,7 @@ export class User {
   @Prop()
   avatar: string;
 
-  @Prop()
+  @Prop({ type: Boolean, default: false })
   isEmailVerified: boolean;
 }
 

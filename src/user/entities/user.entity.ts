@@ -23,10 +23,10 @@ export class UserType {
   @Field(() => RoleEnum, { defaultValue: RoleEnum.USER })
   role: RoleEnum;
 
-  @Field()
+  @Field({nullable:true})
   bio: string;
 
-  @Field()
+  @Field({nullable:true})
   avatar: string;
 
   @Field()

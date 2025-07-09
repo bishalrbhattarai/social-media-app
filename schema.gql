@@ -2,6 +2,37 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type UserType {
+  id: ID!
+  name: String!
+  email: String!
+  role: RoleEnum!
+  bio: String
+  avatar: String
+  isEmailVerified: Boolean!
+}
+
+"""The role of the user in the system"""
+enum RoleEnum {
+  USER
+  ADMIN
+}
+
+type RegisterResponse {
+  message: String!
+  user: UserType!
+}
+
 type Query {
   check: String!
+}
+
+type Mutation {
+  register(input: CreateUserInput!): RegisterResponse!
+}
+
+input CreateUserInput {
+  name: String!
+  email: String!
+  password: String!
 }
