@@ -19,6 +19,11 @@ export interface CreateUserInput {
     password: string;
 }
 
+export interface LoginUserInput {
+    email: string;
+    password: string;
+}
+
 export interface UserType {
     id: string;
     name: string;
@@ -34,12 +39,18 @@ export interface RegisterResponse {
     user: UserType;
 }
 
+export interface LoginResponse {
+    message: string;
+    accessToken: string;
+}
+
 export interface IQuery {
     check(): string | Promise<string>;
 }
 
 export interface IMutation {
     register(input: CreateUserInput): RegisterResponse | Promise<RegisterResponse>;
+    login(input: LoginUserInput): LoginResponse | Promise<LoginResponse>;
 }
 
 type Nullable<T> = T | null;

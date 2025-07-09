@@ -13,6 +13,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
       },
       playground: false,
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
+      context: ({ req, res }) => ({ req, res})
     }),
   ],
 })

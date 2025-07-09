@@ -5,4 +5,11 @@ export class PasswordService {
   async hashPassword(password: string): Promise<string> {
     return argon2.hash(password);
   }
+
+  async comparePassword(
+    password: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
+    return argon2.verify(hashedPassword, password);
+  }
 }
