@@ -1,9 +1,10 @@
-import { Query, Resolver } from '@nestjs/graphql';
+import { Mutation, Query, Resolver } from '@nestjs/graphql';
 
 @Resolver()
 export class UserResolver {
   @Query(() => String)
-  check() {
+  check(): string {
     return 'User resolver is working!';
   }
+
 }

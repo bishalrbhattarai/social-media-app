@@ -20,9 +20,6 @@ export class UserType {
   @Field()
   email: string;
 
-  @Field()
-  password: string;
-
   @Field(() => RoleEnum, { defaultValue: RoleEnum.USER })
   role: RoleEnum;
 

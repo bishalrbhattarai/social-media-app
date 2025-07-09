@@ -1,4 +1,5 @@
-import { Prop, Schema } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
 export enum RoleEnum {
   USER = 'user',
@@ -10,7 +11,7 @@ export class User {
   @Prop()
   name: string;
 
-  @Prop()
+  @Prop({unique: true}) 
   email: string;
 
   @Prop()
@@ -28,3 +29,6 @@ export class User {
   @Prop()
   isEmailVerified: boolean;
 }
+
+export type UserDocument = User & Document;
+export const UserSchema = SchemaFactory.createForClass(User);
