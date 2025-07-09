@@ -25,6 +25,10 @@ export class AuthService {
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
+  async validateToken(token: string) {
+
+  }
+
   async login(input: LoginUserInput, res: Response): Promise<LoginResponse> {
     const user: UserDocument | null = await this.userService.findOneByEmail(
       input.email,

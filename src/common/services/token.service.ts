@@ -20,6 +20,12 @@ export class TokenService {
     return { token, jti: accessTokenJti };
   }
 
+  async verifyAccessToken(token: string) {
+    return this.jwtService.verify(token, {
+      secret: 'your-access-token-secret',
+    });
+  }
+
   generateRefreshToken(payload: JwtPayload) {
     const refreshTokenJti = uuidv4();
     const token = this.jwtService.sign(payload, {
