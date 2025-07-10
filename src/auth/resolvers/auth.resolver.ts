@@ -6,15 +6,28 @@ import { LoginResponse } from '../response/login-response';
 import { Request, Response } from 'express';
 import { RefreshTokenResponse } from '../response/refresh-token-response';
 import { LogoutResponse } from '../response/logout-response';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/common/guards/auth.guard';
+
+export interface User {
+  _id: string;
+  email: string;
+}
 
 export interface GqlContext {
-  req: Request;
+  req: Request & { user?: User };
   res: Response;
 }
 
 @Resolver()
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
+
+  @Query(() => String)
+  @UseGuards(AuthGuard)
+  me() {
+    return 'Hello World from me query';
+  }
 
   @Mutation(() => RegisterResponse)
   register(@Args('input') input: CreateUserInput): Promise<RegisterResponse> {

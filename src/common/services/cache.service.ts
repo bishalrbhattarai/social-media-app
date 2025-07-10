@@ -4,7 +4,9 @@ import { Cache } from 'cache-manager';
 
 @Injectable()
 export class CacheService {
-  constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
+  constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {
+    this.cacheManager.set('demo string', 'hello');
+  }
 
   async setAccessAndRefreshTokens(
     accessJti: string,
@@ -18,11 +20,25 @@ export class CacheService {
       15 * 60 * 1000,
     );
 
+    console.log(
+      `Setting access token in cache with key: access-token:${accessJti} and 
+      -----------------------------------------------------------------------
+      instantly getting the value`,
+    );
+    console.log(await this.cacheManager.get(`access-token:${accessJti}`));
+
     await this.cacheManager.set(
       `refresh-token:${refreshJti}`,
       refreshToken,
       7 * 24 * 60 * 60 * 1000,
     );
+
+    console.log(
+      `Setting refresh token in cache with key: refresh-token:${refreshJti} and 
+      --------------------------------------------------------------------
+      instantly getting the value`,
+    );
+    console.log(await this.cacheManager.get(`refresh-token:${refreshJti}`));
   }
 
   async set(key: string, value: any, ttl?: number): Promise<void> {
@@ -38,10 +54,10 @@ export class CacheService {
   async get<T>(key: string): Promise<T | undefined> {
     try {
       const result = await this.cacheManager.get<T>(key);
-      console.log(`Cache GET: ${key}`);
+      console.log(`Cache GET: ${key}`+result);
       return result;
     } catch (error) {
-      console.error(`Failed to get cache for key: ${key}`, error);
+      console.error(`Failed to get cache for the key: ${key}`, error);
       throw error;
     }
   }

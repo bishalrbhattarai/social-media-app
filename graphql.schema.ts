@@ -55,6 +55,7 @@ export interface LogoutResponse {
 
 export interface IQuery {
     check(): string | Promise<string>;
+    me(): string | Promise<string>;
 }
 
 export interface IMutation {

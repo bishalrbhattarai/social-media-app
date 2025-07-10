@@ -39,6 +39,7 @@ type LogoutResponse {
 
 type Query {
   check: String!
+  me: String!
 }
 
 type Mutation {

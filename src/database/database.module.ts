@@ -28,7 +28,7 @@ export class DatabaseModule implements OnModuleInit {
     return this.connection.readyState === 1
       ? 'Database connected'
       : 'Database not connected';
-  }
+  } 
 
   onModuleInit() {
     console.log(this.checkStatus());
