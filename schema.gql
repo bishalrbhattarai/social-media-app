@@ -28,12 +28,18 @@ type LoginResponse {
   accessToken: String!
 }
 
+type RefreshTokenResponse {
+  accessToken: String!
+  message: String!
+}
+
 type Query {
   check: String!
 }
 
 type Mutation {
   register(input: CreateUserInput!): RegisterResponse!
+  refreshAccessToken: RefreshTokenResponse!
   login(input: LoginUserInput!): LoginResponse!
 }
 

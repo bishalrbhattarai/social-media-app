@@ -20,6 +20,8 @@ export class AuthResolver {
     return this.authService.register(input);
   }
 
+
+  @Mutation(()=>RefreshTokenResponse)
   refreshAccessToken(
     @Context() { req, res }: GqlContext,
   ): Promise<RefreshTokenResponse> {
@@ -29,7 +31,7 @@ export class AuthResolver {
   @Mutation(() => LoginResponse)
   login(
     @Args('input') input: LoginUserInput,
-    @Context() { res }: { res: Response },
+    @Context() { res }: GqlContext,
   ): Promise<LoginResponse> {
     return this.authService.login(input, res);
   }

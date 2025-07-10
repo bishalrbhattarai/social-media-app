@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Jwt } from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface JwtPayload {
   sub: string;
   email: string;
   iat?: number;
+  isEmailVerified?: boolean;
   exp?: number;
   jti?: string;
 }

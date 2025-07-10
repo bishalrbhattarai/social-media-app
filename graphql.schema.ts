@@ -44,12 +44,18 @@ export interface LoginResponse {
     accessToken: string;
 }
 
+export interface RefreshTokenResponse {
+    accessToken: string;
+    message: string;
+}
+
 export interface IQuery {
     check(): string | Promise<string>;
 }
 
 export interface IMutation {
     register(input: CreateUserInput): RegisterResponse | Promise<RegisterResponse>;
+    refreshAccessToken(): RefreshTokenResponse | Promise<RefreshTokenResponse>;
     login(input: LoginUserInput): LoginResponse | Promise<LoginResponse>;
 }
 
