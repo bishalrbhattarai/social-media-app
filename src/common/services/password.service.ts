@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as argon2 from 'argon2';
 @Injectable()
 export class PasswordService {
@@ -10,6 +10,8 @@ export class PasswordService {
     password: string,
     hashedPassword: string,
   ): Promise<boolean> {
-    return argon2.verify(hashedPassword, password);
+    const isValid = argon2.verify(hashedPassword, password);
+    if (!isValid) throw new BadRequestException('Invalid credentials');
+    return isValid;
   }
 }

@@ -13,6 +13,7 @@ import { Request, Response } from 'express';
 import { LoginResponse } from '../response/login-response';
 import { RefreshTokenResponse } from '../response/refresh-token-response';
 import { CacheService } from 'src/common/services/cache.service';
+import { LogoutResponse } from '../response/logout-response';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +23,37 @@ export class AuthService {
     private readonly tokenService: TokenService,
     private readonly cacheService: CacheService,
   ) {}
+
+  async logout(req: Request, res: Response): Promise<LogoutResponse> {
+    const headers = req.headers.authorization?.split(' ')[1];
+    console.log(`the headers are: ${headers}`);
+    if (!headers) throw new BadRequestException('Token is missing');
+    const accessTokenPayload = this.tokenService.verifyAccessToken(headers);
+    console.log(accessTokenPayload);
+    if (!accessTokenPayload)
+      throw new BadRequestException('Invalid access token');
+    const value = await this.cacheService.get(
+      `access-token:${accessTokenPayload.jti}`,
+    );
+    console.log(`the value from the cache is: ${value}`);
+    if (!value) throw new BadRequestException('Access token not found');
+    await this.cacheService.del(`access-token:${accessTokenPayload.jti}`);
+    const refreshToken = req.cookies['refresh_token'];
+    if (!refreshToken)
+      throw new BadRequestException('Refresh token is missing');
+    const decoded = this.tokenService.verifyRefreshToken(refreshToken);
+    if (!decoded) throw new BadRequestException('Invalid refresh token');
+    const refreshTokenValue = await this.cacheService.get(
+      `refresh-token:${decoded.jti}`,
+    );
+    if (!refreshTokenValue)
+      throw new BadRequestException('Refresh token not found');
+    await this.cacheService.del(`refresh-token:${decoded.jti}`);
+
+    return {
+      message: 'Logged out successfully',
+    };
+  }
 
   async refreshAccessToken(
     req: Request,
@@ -67,38 +99,37 @@ export class AuthService {
     const user = await this.userService.findOneByEmail(input.email);
     if (!user) throw new NotFoundException('User not found');
 
-    const isPasswordValid = await this.passwordService.comparePassword(
-      input.password,
-      user.password,
-    );
-    if (!isPasswordValid) throw new BadRequestException('Invalid credentials');
+    await this.passwordService.comparePassword(input.password, user.password);
 
-    const payload = { sub: user._id as string, email: user.email, isEmailVerified: user.isEmailVerified };
-    const { token: accessToken, jti: accessJti } =
-      this.tokenService.generateAccessToken(payload);
-    const { token: refreshToken, jti: refreshJti } =
-      this.tokenService.generateRefreshToken(payload);
+    const payload = {
+      sub: user._id as string,
+      email: user.email,
+      isEmailVerified: user.isEmailVerified,
+    };
 
-    res.cookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: false,
-    });
+    const { accessToken, accessTokenJti, refreshToken, refreshTokenJti } =
+      this.tokenService.generateAccessAndRefreshTokens(payload);
 
-    await this.cacheService.set(
-      `access-token:${accessJti}`,
+    this.setRefreshTokenCookie(res, refreshToken);
+
+    await this.cacheService.setAccessAndRefreshTokens(
+      accessTokenJti,
+      refreshTokenJti,
       accessToken,
-      15 * 60,
-    );
-    await this.cacheService.set(
-      `refresh-token:${refreshJti}`,
       refreshToken,
-      7 * 24 * 60 * 60,
     );
-
     return {
       message: 'Login successful',
       accessToken,
     };
+  }
+
+  private setRefreshTokenCookie(res: Response, refreshToken: string): void {
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: false,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
   }
 
   async register(input: CreateUserInput): Promise<RegisterResponse> {

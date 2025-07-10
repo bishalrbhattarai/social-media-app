@@ -49,6 +49,10 @@ export interface RefreshTokenResponse {
     message: string;
 }
 
+export interface LogoutResponse {
+    message: string;
+}
+
 export interface IQuery {
     check(): string | Promise<string>;
 }
@@ -56,6 +60,7 @@ export interface IQuery {
 export interface IMutation {
     register(input: CreateUserInput): RegisterResponse | Promise<RegisterResponse>;
     refreshAccessToken(): RefreshTokenResponse | Promise<RefreshTokenResponse>;
+    logout(): LogoutResponse | Promise<LogoutResponse>;
     login(input: LoginUserInput): LoginResponse | Promise<LoginResponse>;
 }
 

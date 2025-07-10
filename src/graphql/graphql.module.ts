@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { GqlContext } from 'src/auth/resolvers/auth.resolver';
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -13,7 +14,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
       },
       playground: false,
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
-      context: ({ req, res }) => ({ req, res})
+      context: ({ req, res }): GqlContext => ({ req, res }),
     }),
   ],
 })

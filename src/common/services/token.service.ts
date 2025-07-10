@@ -15,6 +15,20 @@ export interface JwtPayload {
 export class TokenService {
   constructor(private readonly jwtService: JwtService) {}
 
+  generateAccessAndRefreshTokens(payload: JwtPayload) {
+    const { token: accessToken, jti: accessTokenJti } =
+      this.generateAccessToken(payload);
+    const { token: refreshToken, jti: refreshTokenJti } =
+      this.generateRefreshToken(payload);
+
+    return {
+      accessToken,
+      accessTokenJti,
+      refreshToken,
+      refreshTokenJti,
+    };
+  }
+
   generateAccessToken(payload: JwtPayload) {
     const accessTokenJti = uuidv4();
     const token = this.jwtService.sign(payload, {
@@ -28,7 +42,7 @@ export class TokenService {
   verifyAccessToken(token: string): JwtPayload {
     return this.jwtService.verify(token, {
       secret: 'your-access-token-secret',
-    });
+    }); 
   }
 
   verifyRefreshToken(token: string): JwtPayload {

@@ -33,6 +33,10 @@ type RefreshTokenResponse {
   message: String!
 }
 
+type LogoutResponse {
+  message: String!
+}
+
 type Query {
   check: String!
 }
@@ -40,6 +44,7 @@ type Query {
 type Mutation {
   register(input: CreateUserInput!): RegisterResponse!
   refreshAccessToken: RefreshTokenResponse!
+  logout: LogoutResponse!
   login(input: LoginUserInput!): LoginResponse!
 }
 

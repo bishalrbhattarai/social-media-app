@@ -6,6 +6,25 @@ import { Cache } from 'cache-manager';
 export class CacheService {
   constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
 
+  async setAccessAndRefreshTokens(
+    accessJti: string,
+    refreshJti: string,
+    accessToken: string,
+    refreshToken: string,
+  ): Promise<void> {
+    await this.cacheManager.set(
+      `access-token:${accessJti}`,
+      accessToken,
+      15 * 60 * 1000,
+    );
+
+    await this.cacheManager.set(
+      `refresh-token:${refreshJti}`,
+      refreshToken,
+      7 * 24 * 60 * 60 * 1000,
+    );
+  }
+
   async set(key: string, value: any, ttl?: number): Promise<void> {
     try {
       await this.cacheManager.set(key, value, ttl);

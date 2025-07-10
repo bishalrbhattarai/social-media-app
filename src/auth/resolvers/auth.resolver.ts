@@ -5,8 +5,9 @@ import { RegisterResponse } from '../response/register-response';
 import { LoginResponse } from '../response/login-response';
 import { Request, Response } from 'express';
 import { RefreshTokenResponse } from '../response/refresh-token-response';
+import { LogoutResponse } from '../response/logout-response';
 
-interface GqlContext {
+export interface GqlContext {
   req: Request;
   res: Response;
 }
@@ -20,12 +21,17 @@ export class AuthResolver {
     return this.authService.register(input);
   }
 
-
-  @Mutation(()=>RefreshTokenResponse)
+  @Mutation(() => RefreshTokenResponse)
   refreshAccessToken(
     @Context() { req, res }: GqlContext,
   ): Promise<RefreshTokenResponse> {
     return this.authService.refreshAccessToken(req, res);
+  }
+
+  @Mutation(() => LogoutResponse)
+  async logout(@Context() { req, res }: GqlContext): Promise<LogoutResponse> {
+    await this.authService.logout(req, res);
+    return { message: 'Logged out successfully' };
   }
 
   @Mutation(() => LoginResponse)
