@@ -8,6 +8,8 @@ import { CommonModule } from './common/common.module';
 import { RedisCacheModule } from './redis-cache/redis-cache.module';
 import { AuthGuard } from './common/guards/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { EmailModule } from './email/email.module';
+import { JobModule } from './job/job.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { APP_GUARD } from '@nestjs/core';
     DatabaseModule,
     UserModule,
     AuthModule,
+    EmailModule,
+    JobModule,
   ],
 })
 export class AppModule {}

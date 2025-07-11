@@ -20,31 +20,16 @@ export class CacheService {
       15 * 60 * 1000,
     );
 
-    console.log(
-      `Setting access token in cache with key: access-token:${accessJti} and 
-      -----------------------------------------------------------------------
-      instantly getting the value`,
-    );
-    console.log(await this.cacheManager.get(`access-token:${accessJti}`));
-
     await this.cacheManager.set(
       `refresh-token:${refreshJti}`,
       refreshToken,
       7 * 24 * 60 * 60 * 1000,
     );
-
-    console.log(
-      `Setting refresh token in cache with key: refresh-token:${refreshJti} and 
-      --------------------------------------------------------------------
-      instantly getting the value`,
-    );
-    console.log(await this.cacheManager.get(`refresh-token:${refreshJti}`));
   }
 
   async set(key: string, value: any, ttl?: number): Promise<void> {
     try {
       await this.cacheManager.set(key, value, ttl);
-      console.log(`Cache SET: ${key}`);
     } catch (error) {
       console.error(`Failed to set cache for key: ${key}`, error);
       throw error;
@@ -54,7 +39,6 @@ export class CacheService {
   async get<T>(key: string): Promise<T | undefined> {
     try {
       const result = await this.cacheManager.get<T>(key);
-      console.log(`Cache GET: ${key}`+result);
       return result;
     } catch (error) {
       console.error(`Failed to get cache for the key: ${key}`, error);
@@ -65,7 +49,6 @@ export class CacheService {
   async del(key: string): Promise<void> {
     try {
       await this.cacheManager.del(key);
-      console.log(`Cache DEL: ${key}`);
     } catch (error) {
       console.error(`Failed to delete cache key: ${key}`, error);
       throw error;

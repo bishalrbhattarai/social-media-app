@@ -20,22 +20,17 @@ export class AuthGuard implements CanActivate {
     const ctx = GqlExecutionContext.create(context);
     const request = ctx.getContext<GqlContext>().req;
     const token = request.headers['authorization']?.split(' ')[1];
-    console.log(token);
     if (!token) throw new UnauthorizedException('Token is Missing');
     const payload = this.tokenService.verifyAccessToken(token);
-    console.log(`Inside the AuthGuard`);
-    console.log(payload);
     if (!payload) throw new UnauthorizedException('Invalid Token');
     const cacheValue = await this.cacheService.get<string>(
       `access-token:${payload.jti}`,
     );
-    console.log(`access-token:${payload.jti}`);
 
-    if (!cacheValue) throw new UnauthorizedException('Unauthorized User yo chai value na huda');
+    if (!cacheValue) throw new UnauthorizedException('Unauthorized User');
     if (cacheValue !== token)
-      throw new UnauthorizedException('Unauthorized User yo chai cache value == token check gareko');
+      throw new UnauthorizedException('Unauthorized User');
     request.user = { ...payload, _id: payload.sub };
-    console.log(request.user);
     return true;
   }
 }

@@ -8,6 +8,7 @@ import { RefreshTokenResponse } from '../response/refresh-token-response';
 import { LogoutResponse } from '../response/logout-response';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/common/guards/auth.guard';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 
 export interface User {
   _id: string;
@@ -25,7 +26,9 @@ export class AuthResolver {
 
   @Query(() => String)
   @UseGuards(AuthGuard)
-  me() {
+  me(@CurrentUser() user: User): string {
+    console.log(`From User Custom Decorator current User and the value is`);
+    console.log(user);
     return 'Hello World from me query';
   }
 

@@ -14,6 +14,8 @@ import { LoginResponse } from '../response/login-response';
 import { RefreshTokenResponse } from '../response/refresh-token-response';
 import { CacheService } from 'src/common/services/cache.service';
 import { LogoutResponse } from '../response/logout-response';
+import { EmailVerificationJobService } from 'src/job/email-verification.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +24,7 @@ export class AuthService {
     private readonly passwordService: PasswordService,
     private readonly tokenService: TokenService,
     private readonly cacheService: CacheService,
+    private readonly emailVerificationJobService: EmailVerificationJobService,
   ) {}
 
   async logout(req: Request, res: Response): Promise<LogoutResponse> {
@@ -141,6 +144,12 @@ export class AuthService {
       ...input,
       password,
     });
+
+    if (!createdUser) throw new BadRequestException('User registration failed');
+    // Enqueue email verification job
+    const token = uuidv4();
+
+    await this.emailVerificationJobService.addJob(createdUser.email, token);
 
     return {
       user: createdUser,
