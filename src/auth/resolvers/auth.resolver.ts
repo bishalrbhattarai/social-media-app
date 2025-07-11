@@ -32,6 +32,13 @@ export class AuthResolver {
     return 'Hello World from me query';
   }
 
+  @Mutation(() => String)
+  verifyEmailToken(@Context() { req }: GqlContext): string {
+    console.log('From verifyEmailToken mutation');
+    this.authService.verifyEmailToken(req)
+    return 'Hello World from test mutation';
+  }
+
   @Mutation(() => RegisterResponse)
   register(@Args('input') input: CreateUserInput): Promise<RegisterResponse> {
     return this.authService.register(input);

@@ -59,6 +59,7 @@ export interface IQuery {
 }
 
 export interface IMutation {
+    verifyEmailToken(): string | Promise<string>;
     register(input: CreateUserInput): RegisterResponse | Promise<RegisterResponse>;
     refreshAccessToken(): RefreshTokenResponse | Promise<RefreshTokenResponse>;
     logout(): LogoutResponse | Promise<LogoutResponse>;

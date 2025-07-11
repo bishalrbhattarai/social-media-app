@@ -14,4 +14,9 @@ export class UserService {
   async createUser(input: CreateUserInput): Promise<UserDocument> {
     return this.userRepository.create(input);
   }
+
+  async findOneById(_id: string): Promise<UserDocument | null> {
+    return this.userRepository.findOne({ _id });
+  }
+
 }

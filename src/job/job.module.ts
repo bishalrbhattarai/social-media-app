@@ -1,5 +1,5 @@
 import { BullModule } from '@nestjs/bull';
-import { Module } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { EmailModule } from 'src/email/email.module';
 import { EmailVerificationJobService } from './email-verification.service';
 import { EmailVerificationProcessor } from './email.processor';
@@ -20,4 +20,8 @@ import { EmailVerificationProcessor } from './email.processor';
   providers: [EmailVerificationProcessor, EmailVerificationJobService],
   exports: [EmailVerificationJobService],
 })
-export class JobModule {}
+export class JobModule implements OnModuleInit {
+  onModuleInit() {
+    console.log('JobModule initialized');
+  }
+}

@@ -27,6 +27,26 @@ export class AuthService {
     private readonly emailVerificationJobService: EmailVerificationJobService,
   ) {}
 
+  async verifyEmailToken(req: Request) {
+    const token = req.headers['email-verification-token'];
+    if (!token) throw new BadRequestException('Token is missing');
+    const _id = await this.cacheService.get<string>(
+      `email-verification:${token}`,
+    );
+    if (!_id) throw new BadRequestException('Invalid email-verification-token');
+    const user = await this.userService.findOneById(_id);
+    if (!user) throw new NotFoundException('User not found');
+    if (user.isEmailVerified)
+      throw new BadRequestException('Email already verified');
+    user.isEmailVerified = true;
+    await user.save();
+
+    await this.cacheService.del(`email-verification:${token}`);
+    return {
+      message: 'Email verified successfully',
+    };
+  }
+
   async logout(req: Request, res: Response): Promise<LogoutResponse> {
     const headers = req.headers.authorization?.split(' ')[1];
     console.log(`the headers are: ${headers}`);
@@ -146,11 +166,14 @@ export class AuthService {
     });
 
     if (!createdUser) throw new BadRequestException('User registration failed');
-    // Enqueue email verification job
     const token = uuidv4();
 
-    await this.emailVerificationJobService.addJob(createdUser.email, token);
-
+    await this.cacheService.set(
+      `email-verification:${token}`,
+      createdUser._id,
+      30 * 60 * 1000,
+    );
+    this.emailVerificationJobService.addJob(createdUser.email, token);
     return {
       user: createdUser,
       message: 'User registration successfully',

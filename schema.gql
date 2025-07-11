@@ -43,6 +43,7 @@ type Query {
 }
 
 type Mutation {
+  verifyEmailToken: String!
   register(input: CreateUserInput!): RegisterResponse!
   refreshAccessToken: RefreshTokenResponse!
   logout: LogoutResponse!
