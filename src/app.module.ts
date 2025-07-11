@@ -10,6 +10,7 @@ import { AuthGuard } from './common/guards/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { EmailModule } from './email/email.module';
 import { JobModule } from './job/job.module';
+import { PostModule } from './post/post.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { JobModule } from './job/job.module';
     AuthModule,
     EmailModule,
     JobModule,
+    PostModule,
   ],
 })
 export class AppModule {}
