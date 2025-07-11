@@ -9,6 +9,7 @@ import { LogoutResponse } from '../response/logout-response';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { EmailVerificationResponse } from '../response/email-verification-response';
 
 export interface User {
   _id: string;
@@ -32,11 +33,12 @@ export class AuthResolver {
     return 'Hello World from me query';
   }
 
-  @Mutation(() => String)
-  verifyEmailToken(@Context() { req }: GqlContext): string {
+  @Mutation(() => EmailVerificationResponse)
+  verifyEmailToken(
+    @Context() { req }: GqlContext,
+  ): Promise<EmailVerificationResponse> {
     console.log('From verifyEmailToken mutation');
-    this.authService.verifyEmailToken(req)
-    return 'Hello World from test mutation';
+    return this.authService.verifyEmailToken(req);
   }
 
   @Mutation(() => RegisterResponse)

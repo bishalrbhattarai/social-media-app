@@ -37,13 +37,17 @@ type LogoutResponse {
   message: String!
 }
 
+type EmailVerificationResponse {
+  message: String!
+}
+
 type Query {
   check: String!
   me: String!
 }
 
 type Mutation {
-  verifyEmailToken: String!
+  verifyEmailToken: EmailVerificationResponse!
   register(input: CreateUserInput!): RegisterResponse!
   refreshAccessToken: RefreshTokenResponse!
   logout: LogoutResponse!

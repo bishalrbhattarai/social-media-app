@@ -16,6 +16,7 @@ import { CacheService } from 'src/common/services/cache.service';
 import { LogoutResponse } from '../response/logout-response';
 import { EmailVerificationJobService } from 'src/job/email-verification.service';
 import { v4 as uuidv4 } from 'uuid';
+import { EmailVerificationResponse } from '../response/email-verification-response';
 
 @Injectable()
 export class AuthService {
@@ -27,7 +28,7 @@ export class AuthService {
     private readonly emailVerificationJobService: EmailVerificationJobService,
   ) {}
 
-  async verifyEmailToken(req: Request) {
+  async verifyEmailToken(req: Request): Promise<EmailVerificationResponse> {
     const token = req.headers['email-verification-token'];
     if (!token) throw new BadRequestException('Token is missing');
     const _id = await this.cacheService.get<string>(
@@ -36,11 +37,9 @@ export class AuthService {
     if (!_id) throw new BadRequestException('Invalid email-verification-token');
     const user = await this.userService.findOneById(_id);
     if (!user) throw new NotFoundException('User not found');
-    if (user.isEmailVerified)
-      throw new BadRequestException('Email already verified');
+    if (user.isEmailVerified) throw new BadRequestException('Email already verified');
     user.isEmailVerified = true;
     await user.save();
-
     await this.cacheService.del(`email-verification:${token}`);
     return {
       message: 'Email verified successfully',
@@ -52,13 +51,11 @@ export class AuthService {
     console.log(`the headers are: ${headers}`);
     if (!headers) throw new BadRequestException('Token is missing');
     const accessTokenPayload = this.tokenService.verifyAccessToken(headers);
-    console.log(accessTokenPayload);
     if (!accessTokenPayload)
       throw new BadRequestException('Invalid access token');
     const value = await this.cacheService.get(
       `access-token:${accessTokenPayload.jti}`,
     );
-    console.log(`the value from the cache is: ${value}`);
     if (!value) throw new BadRequestException('Access token not found');
     await this.cacheService.del(`access-token:${accessTokenPayload.jti}`);
     const refreshToken = req.cookies['refresh_token'];
@@ -115,7 +112,6 @@ export class AuthService {
   async validateToken(token: string) {
     const decoded = this.tokenService.verifyAccessToken(token);
     const value = await this.cacheService.get(`access-token:${decoded.jti}`);
-    console.log(`the value from the cache is: ${value}`);
   }
 
   async login(input: LoginUserInput, res: Response): Promise<LoginResponse> {

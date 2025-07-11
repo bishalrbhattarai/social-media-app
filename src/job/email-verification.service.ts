@@ -10,7 +10,6 @@ export class EmailVerificationJobService {
   ) {}
 
   async addJob(to: string, token: string) {
-    console.log(`inside the addJob method of EmailVerificationJobService`);
      this.emailQueue.add('send-verification-email', {
       to,
       token,

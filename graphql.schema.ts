@@ -53,13 +53,17 @@ export interface LogoutResponse {
     message: string;
 }
 
+export interface EmailVerificationResponse {
+    message: string;
+}
+
 export interface IQuery {
     check(): string | Promise<string>;
     me(): string | Promise<string>;
 }
 
 export interface IMutation {
-    verifyEmailToken(): string | Promise<string>;
+    verifyEmailToken(): EmailVerificationResponse | Promise<EmailVerificationResponse>;
     register(input: CreateUserInput): RegisterResponse | Promise<RegisterResponse>;
     refreshAccessToken(): RefreshTokenResponse | Promise<RefreshTokenResponse>;
     logout(): LogoutResponse | Promise<LogoutResponse>;
