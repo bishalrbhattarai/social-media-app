@@ -1,6 +1,20 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, SchemaTypes, Types } from 'mongoose';
 
+@Schema({ _id: false })
+export class RecentComment {
+  @Prop()
+  content: string;
+
+  @Prop({ type: SchemaTypes.ObjectId, ref: 'User' })
+  authorId: Types.ObjectId;
+
+  @Prop()
+  authorName: string;
+}
+
+export const RecentCommentSchema = SchemaFactory.createForClass(RecentComment);
+
 @Schema({ timestamps: true })
 export class Post {
   @Prop()
@@ -9,25 +23,20 @@ export class Post {
   @Prop()
   authorName: string;
 
-  @Prop({ type: SchemaTypes.ObjectId, ref: 'User' })
+  @Prop({ type: SchemaTypes.ObjectId, ref: 'User', index: true })
   authorId: Types.ObjectId;
 
-  @Prop({ type: [String], default: [] })
-  images: string[];
+  @Prop({ default: '' })
+  image: string;
 
-  @Prop()
+  @Prop({ type: Number, default: 0 })
   likes: number;
 
-  @Prop()
+  @Prop({ type: Number, default: 0 })
   commentsCount: number;
 
-  recentComments: [
-    {
-      content: string;
-      authorId: { type: Types.ObjectId; ref: 'User' };
-      authorName: string;
-    },
-  ];
+  @Prop({ type: [RecentComment], default: [] })
+  recentComments: RecentComment[];
 }
 
 export type PostDocument = Post & Document;

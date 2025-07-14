@@ -41,9 +41,52 @@ type EmailVerificationResponse {
   message: String!
 }
 
+type RecentCommentType {
+  content: String!
+  authorId: String!
+  authorName: String!
+}
+
+type PostType {
+  id: String!
+  description: String!
+  authorName: String!
+  authorId: String!
+  image: String
+  likes: Float!
+  commentsCount: Float!
+  recentComments: [RecentCommentType!]
+}
+
+type PostEdge {
+  node: PostType!
+  cursor: String!
+}
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+}
+
+type PostConnection {
+  edges: [PostEdge!]!
+  pageInfo: PageInfo!
+}
+
+type CreatePostResponse {
+  message: String!
+  post: PostType!
+}
+
 type Query {
   check: String!
   me: String!
+  posts(input: PaginationInput = {first: 5}): PostConnection!
+}
+
+input PaginationInput {
+  first: Float! = 5
+  after: String
 }
 
 type Mutation {
@@ -52,6 +95,7 @@ type Mutation {
   refreshAccessToken: RefreshTokenResponse!
   logout: LogoutResponse!
   login(input: LoginUserInput!): LoginResponse!
+  createPost(input: CreatePostInput!): CreatePostResponse!
 }
 
 input CreateUserInput {
@@ -63,4 +107,9 @@ input CreateUserInput {
 input LoginUserInput {
   email: String!
   password: String!
+}
+
+input CreatePostInput {
+  description: String!
+  image: String
 }

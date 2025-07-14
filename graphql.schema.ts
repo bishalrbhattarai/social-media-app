@@ -13,6 +13,11 @@ export enum RoleEnum {
     ADMIN = "ADMIN"
 }
 
+export interface PaginationInput {
+    first: number;
+    after?: Nullable<string>;
+}
+
 export interface CreateUserInput {
     name: string;
     email: string;
@@ -22,6 +27,11 @@ export interface CreateUserInput {
 export interface LoginUserInput {
     email: string;
     password: string;
+}
+
+export interface CreatePostInput {
+    description: string;
+    image?: Nullable<string>;
 }
 
 export interface UserType {
@@ -57,9 +67,47 @@ export interface EmailVerificationResponse {
     message: string;
 }
 
+export interface RecentCommentType {
+    content: string;
+    authorId: string;
+    authorName: string;
+}
+
+export interface PostType {
+    id: string;
+    description: string;
+    authorName: string;
+    authorId: string;
+    image?: Nullable<string>;
+    likes: number;
+    commentsCount: number;
+    recentComments?: Nullable<RecentCommentType[]>;
+}
+
+export interface PostEdge {
+    node: PostType;
+    cursor: string;
+}
+
+export interface PageInfo {
+    endCursor?: Nullable<string>;
+    hasNextPage: boolean;
+}
+
+export interface PostConnection {
+    edges: PostEdge[];
+    pageInfo: PageInfo;
+}
+
+export interface CreatePostResponse {
+    message: string;
+    post: PostType;
+}
+
 export interface IQuery {
     check(): string | Promise<string>;
     me(): string | Promise<string>;
+    posts(input?: Nullable<PaginationInput>): PostConnection | Promise<PostConnection>;
 }
 
 export interface IMutation {
@@ -68,6 +116,7 @@ export interface IMutation {
     refreshAccessToken(): RefreshTokenResponse | Promise<RefreshTokenResponse>;
     logout(): LogoutResponse | Promise<LogoutResponse>;
     login(input: LoginUserInput): LoginResponse | Promise<LoginResponse>;
+    createPost(input: CreatePostInput): CreatePostResponse | Promise<CreatePostResponse>;
 }
 
 type Nullable<T> = T | null;
