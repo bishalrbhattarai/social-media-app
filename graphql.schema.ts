@@ -104,6 +104,10 @@ export interface CreatePostResponse {
     post: PostType;
 }
 
+export interface DeletePostResponse {
+    message: string;
+}
+
 export interface IQuery {
     check(): string | Promise<string>;
     me(): string | Promise<string>;
@@ -117,6 +121,7 @@ export interface IMutation {
     logout(): LogoutResponse | Promise<LogoutResponse>;
     login(input: LoginUserInput): LoginResponse | Promise<LoginResponse>;
     createPost(input: CreatePostInput): CreatePostResponse | Promise<CreatePostResponse>;
+    deletePost(id: string): DeletePostResponse | Promise<DeletePostResponse>;
 }
 
 export type Upload = any;

@@ -17,6 +17,9 @@ export abstract class DatabaseRepository<T> {
     return this.model.create(data);
   }
 
+  async delete(filter: FilterQuery<T>): Promise<T | null> {
+    return this.model.findOneAndDelete(filter).exec();
+  }
   async find(
     filter: FilterQuery<T> = {},
     { first = 10, after, sort = { _id: -1 } }: FindOptions = {},

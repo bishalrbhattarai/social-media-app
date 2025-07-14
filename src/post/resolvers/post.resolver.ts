@@ -8,10 +8,11 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { User } from 'src/auth/resolvers/auth.resolver';
 import { PostConnection } from '../entities/post.entity';
 import { PaginationInput } from '../dtos/pagination.dto';
+import { DeletePostResponse } from '../response/delete-post.response';
 
 @Resolver()
 export class PostResolver {
-  constructor(private readonly postService: PostService) {}
+  constructor(private readonly postService: PostService) { }
 
   @Mutation(() => CreatePostResponse)
   @UseGuards(AuthGuard)
@@ -19,7 +20,6 @@ export class PostResolver {
     @CurrentUser() user: User,
     @Args('input') input: CreatePostInput,
   ): Promise<CreatePostResponse> {
-    console.log(input);
     return this.postService.createPost(input, user);
   }
 
@@ -29,5 +29,16 @@ export class PostResolver {
     input: PaginationInput,
   ): Promise<PostConnection> {
     return this.postService.findAllPosts(input);
+  }
+
+
+
+  @Mutation(() => DeletePostResponse)
+  @UseGuards(AuthGuard)
+  async deletePost(
+    @Args('id') id: string,
+  ): Promise<DeletePostResponse> {
+    return this.postService.deletePost(id);
+    
   }
 }

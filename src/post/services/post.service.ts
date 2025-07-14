@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PostRepository } from '../repositories/post.repository';
 import { CreatePostInput } from '../dtos/post.dto';
 import { User } from 'src/auth/resolvers/auth.resolver';
@@ -8,12 +8,14 @@ import { CreatePostResponse } from '../response/create-post.response';
 import { toPostType } from '../mappers/post.mapper';
 import { PostConnection, PostEdge } from '../entities/post.entity';
 import { PaginationInput } from '../dtos/pagination.dto';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class PostService {
   constructor(
     private readonly postRepository: PostRepository,
     private readonly userService: UserService,
+    private readonly cloudinaryService: CloudinaryService, 
   ) {}
 
   async findAllPosts(input: PaginationInput): Promise<PostConnection> {
@@ -43,6 +45,18 @@ export class PostService {
     };
   }
 
+
+  async deletePost(id:string){
+   const deletedPost = await this.postRepository.delete({ _id: new mongoose.Types.ObjectId(id) })
+    if (!deletedPost) 
+      throw new NotFoundException('Post not found or already deleted');
+  
+    return {
+      message: 'Post deleted successfully',
+    }
+  
+  }
+
   async createPost(
     input: CreatePostInput,
     user: User,
@@ -52,11 +66,12 @@ export class PostService {
 
     let imageUrl = '';
 
-    if (input.image) {
-      console.log('Image upload detected');
-      const file = await input.image;
-      console.log(file);
-    }
+  if (input.image) {
+    const file = await input.image;
+    const uploadResult = await this.cloudinaryService.uploadStream(file);
+    imageUrl = uploadResult.secure_url;
+  }
+
 
     const createdPost = await this.postRepository.create({
       description: input.description,

@@ -78,6 +78,10 @@ type CreatePostResponse {
   post: PostType!
 }
 
+type DeletePostResponse {
+  message: String!
+}
+
 type Query {
   check: String!
   me: String!
@@ -96,6 +100,7 @@ type Mutation {
   logout: LogoutResponse!
   login(input: LoginUserInput!): LoginResponse!
   createPost(input: CreatePostInput!): CreatePostResponse!
+  deletePost(id: String!): DeletePostResponse!
 }
 
 input CreateUserInput {
