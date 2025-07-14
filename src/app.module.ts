@@ -9,6 +9,7 @@ import { RedisCacheModule } from './redis-cache/redis-cache.module';
 import { EmailModule } from './email/email.module';
 import { JobModule } from './job/job.module';
 import { PostModule } from './post/post.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { PostModule } from './post/post.module';
     RedisCacheModule,
     GraphqlModule,
     DatabaseModule,
+    CloudinaryModule,
     UserModule,
     AuthModule,
     EmailModule,
