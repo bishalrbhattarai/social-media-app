@@ -1,5 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { GraphQLUpload, FileUpload } from 'graphql-upload';
 
 @InputType()
 export class CreatePostInput {
@@ -8,8 +9,7 @@ export class CreatePostInput {
   @IsString()
   description: string;
 
-  @Field({ nullable: true })
-  @IsNotEmpty()
-  @IsString()
-  image?: string;
+  @Field(() => GraphQLUpload, { nullable: true })
+  @IsOptional()
+  image?: Promise<FileUpload>;
 }

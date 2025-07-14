@@ -15,6 +15,7 @@ import { GqlContext } from 'src/auth/resolvers/auth.resolver';
       playground: false,
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
       context: ({ req, res }): GqlContext => ({ req, res }),
+      csrfPrevention: false,
     }),
   ],
 })

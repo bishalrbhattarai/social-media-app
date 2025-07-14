@@ -19,8 +19,9 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context);
     const request = ctx.getContext<GqlContext>().req;
-    // const token = request.headers['authorization']?.split(' ')[1];
-    const token = request.headers['authorization'];
+    const token = request.headers['authorization']?.split(' ')[1];
+    // const token = request.headers['authorization'];
+
 
     if (!token) throw new UnauthorizedException('Token is Missing');
     const payload = this.tokenService.verifyAccessToken(token);

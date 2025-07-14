@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 import { UserService } from 'src/user/services/user.service';
 import { CreatePostResponse } from '../response/create-post.response';
 import { toPostType } from '../mappers/post.mapper';
-import { PostConnection, PostEdge, PostType } from '../entities/post.entity';
+import { PostConnection, PostEdge } from '../entities/post.entity';
 import { PaginationInput } from '../dtos/pagination.dto';
 
 @Injectable()
@@ -23,7 +23,6 @@ export class PostService {
       {},
       { first: first + 1, after },
     );
-
     const hasNextPage = posts.length > first;
 
     const slicedPosts = hasNextPage ? posts.slice(0, first) : posts;
@@ -51,8 +50,17 @@ export class PostService {
     const existingUser = await this.userService.findOneById(user._id);
     if (!existingUser) throw new UnauthorizedException('User not found');
 
+    let imageUrl = '';
+
+    if (input.image) {
+      console.log('Image upload detected');
+      const file = await input.image;
+      console.log(file);
+    }
+
     const createdPost = await this.postRepository.create({
-      ...input,
+      description: input.description,
+      image: imageUrl,
       authorId: new mongoose.Types.ObjectId(user._id),
       authorName: existingUser.name,
     });

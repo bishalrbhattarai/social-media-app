@@ -31,7 +31,7 @@ export interface LoginUserInput {
 
 export interface CreatePostInput {
     description: string;
-    image?: Nullable<string>;
+    image?: Nullable<Upload>;
 }
 
 export interface UserType {
@@ -119,4 +119,5 @@ export interface IMutation {
     createPost(input: CreatePostInput): CreatePostResponse | Promise<CreatePostResponse>;
 }
 
+export type Upload = any;
 type Nullable<T> = T | null;

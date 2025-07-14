@@ -19,6 +19,7 @@ export class PostResolver {
     @CurrentUser() user: User,
     @Args('input') input: CreatePostInput,
   ): Promise<CreatePostResponse> {
+    console.log(input);
     return this.postService.createPost(input, user);
   }
 
