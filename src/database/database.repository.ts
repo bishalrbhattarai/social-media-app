@@ -1,4 +1,10 @@
-import { FilterQuery, Model, SortOrder, Types } from 'mongoose';
+import {
+  FilterQuery,
+  Model,
+  ProjectionFields,
+  SortOrder,
+  Types,
+} from 'mongoose';
 
 interface FindOptions {
   first?: number;
@@ -7,10 +13,13 @@ interface FindOptions {
 }
 
 export abstract class DatabaseRepository<T> {
-  constructor(private readonly model: Model<T>) {}
+  constructor(protected readonly model: Model<T>) {}
 
-  async findOne(filter: FilterQuery<T>): Promise<T | null> {
-    return await this.model.findOne(filter).exec();
+  async findOne(
+    filter: FilterQuery<T>,
+    projection: ProjectionFields<T> = {},
+  ): Promise<T | null> {
+    return await this.model.findOne(filter, projection).exec();
   }
 
   async create(data: Partial<T>): Promise<T> {

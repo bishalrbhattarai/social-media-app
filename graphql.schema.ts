@@ -13,6 +13,18 @@ export enum RoleEnum {
     ADMIN = "ADMIN"
 }
 
+export enum FriendshipStatus {
+    Pending = "Pending",
+    Accepted = "Accepted",
+    Declined = "Declined",
+    Blocked = "Blocked"
+}
+
+export enum FriendRequestAction {
+    ACCEPT = "ACCEPT",
+    DECLINE = "DECLINE"
+}
+
 export interface PaginationInput {
     first: number;
     after?: Nullable<string>;
@@ -108,10 +120,37 @@ export interface DeletePostResponse {
     message: string;
 }
 
+export interface FriendshipType {
+    id: string;
+    requester: string;
+    requesterName: string;
+    recipient: string;
+    recipientName: string;
+    status: FriendshipStatus;
+    createdAt: DateTime;
+    updatedAt: DateTime;
+}
+
+export interface FriendshipEdge {
+    node: FriendshipType;
+    cursor: string;
+}
+
+export interface FriendshipPageInfo {
+    endCursor?: Nullable<string>;
+    hasNextPage: boolean;
+}
+
+export interface FriendshipConnection {
+    edges: FriendshipEdge[];
+    pageInfo: FriendshipPageInfo;
+}
+
 export interface IQuery {
     check(): string | Promise<string>;
     me(): string | Promise<string>;
     posts(input?: Nullable<PaginationInput>): PostConnection | Promise<PostConnection>;
+    myFriends(first?: Nullable<number>, after?: Nullable<string>): FriendshipConnection | Promise<FriendshipConnection>;
 }
 
 export interface IMutation {
@@ -122,7 +161,11 @@ export interface IMutation {
     login(input: LoginUserInput): LoginResponse | Promise<LoginResponse>;
     createPost(input: CreatePostInput): CreatePostResponse | Promise<CreatePostResponse>;
     deletePost(id: string): DeletePostResponse | Promise<DeletePostResponse>;
+    sendFriendRequest(recipient: string): string | Promise<string>;
+    handleFriendRequest(requesterId: string, action: FriendRequestAction): string | Promise<string>;
+    removeFriend(friendId: string): string | Promise<string>;
 }
 
+export type DateTime = any;
 export type Upload = any;
 type Nullable<T> = T | null;

@@ -1,5 +1,5 @@
 import { Module, OnModuleInit } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import {
   InjectConnection,
   ModelDefinition,
@@ -13,6 +13,7 @@ import { Connection } from 'mongoose';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         uri: configService.getOrThrow<string>('DATABASE_URI'),
+
       }),
     }),
   ],

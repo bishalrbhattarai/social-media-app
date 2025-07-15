@@ -82,10 +82,50 @@ type DeletePostResponse {
   message: String!
 }
 
+type FriendshipType {
+  id: ID!
+  requester: ID!
+  requesterName: String!
+  recipient: ID!
+  recipientName: String!
+  status: FriendshipStatus!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Status of the friendship"""
+enum FriendshipStatus {
+  Pending
+  Accepted
+  Declined
+  Blocked
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type FriendshipEdge {
+  node: FriendshipType!
+  cursor: String!
+}
+
+type FriendshipPageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+}
+
+type FriendshipConnection {
+  edges: [FriendshipEdge!]!
+  pageInfo: FriendshipPageInfo!
+}
+
 type Query {
   check: String!
   me: String!
   posts(input: PaginationInput = {first: 5}): PostConnection!
+  myFriends(first: Int, after: String): FriendshipConnection!
 }
 
 input PaginationInput {
@@ -101,6 +141,9 @@ type Mutation {
   login(input: LoginUserInput!): LoginResponse!
   createPost(input: CreatePostInput!): CreatePostResponse!
   deletePost(id: String!): DeletePostResponse!
+  sendFriendRequest(recipient: String!): String!
+  handleFriendRequest(requesterId: String!, action: FriendRequestAction!): String!
+  removeFriend(friendId: String!): String!
 }
 
 input CreateUserInput {
@@ -121,3 +164,9 @@ input CreatePostInput {
 
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
+
+"""Action to handle a friend request (accept or decline)"""
+enum FriendRequestAction {
+  ACCEPT
+  DECLINE
+}

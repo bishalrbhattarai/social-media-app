@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PostRepository } from '../repositories/post.repository';
 import { CreatePostInput } from '../dtos/post.dto';
 import { User } from 'src/auth/resolvers/auth.resolver';
@@ -15,7 +19,7 @@ export class PostService {
   constructor(
     private readonly postRepository: PostRepository,
     private readonly userService: UserService,
-    private readonly cloudinaryService: CloudinaryService, 
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   async findAllPosts(input: PaginationInput): Promise<PostConnection> {
@@ -45,16 +49,16 @@ export class PostService {
     };
   }
 
-
-  async deletePost(id:string){
-   const deletedPost = await this.postRepository.delete({ _id: new mongoose.Types.ObjectId(id) })
-    if (!deletedPost) 
+  async deletePost(id: string) {
+    const deletedPost = await this.postRepository.delete({
+      _id: new mongoose.Types.ObjectId(id),
+    });
+    if (!deletedPost)
       throw new NotFoundException('Post not found or already deleted');
-  
+
     return {
       message: 'Post deleted successfully',
-    }
-  
+    };
   }
 
   async createPost(
@@ -66,12 +70,11 @@ export class PostService {
 
     let imageUrl = '';
 
-  if (input.image) {
-    const file = await input.image;
-    const uploadResult = await this.cloudinaryService.uploadStream(file);
-    imageUrl = uploadResult.secure_url;
-  }
-
+    if (input.image) {
+      const file = await input.image;
+      const uploadResult = await this.cloudinaryService.uploadStream(file);
+      imageUrl = uploadResult.secure_url;
+    }
 
     const createdPost = await this.postRepository.create({
       description: input.description,
@@ -79,7 +82,6 @@ export class PostService {
       authorId: new mongoose.Types.ObjectId(user._id),
       authorName: existingUser.name,
     });
-
     return {
       message: 'Post created successfully',
       post: toPostType(createdPost),
