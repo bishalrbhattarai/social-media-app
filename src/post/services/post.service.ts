@@ -6,13 +6,14 @@ import {
 import { PostRepository } from '../repositories/post.repository';
 import { CreatePostInput } from '../dtos/post.dto';
 import { User } from 'src/auth/resolvers/auth.resolver';
-import mongoose from 'mongoose';
+import mongoose, { UpdateQuery } from 'mongoose';
 import { UserService } from 'src/user/services/user.service';
 import { CreatePostResponse } from '../response/create-post.response';
 import { toPostType } from '../mappers/post.mapper';
 import { PostConnection, PostEdge } from '../entities/post.entity';
 import { PaginationInput } from '../dtos/pagination.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { PostDocument } from '../entities/post.schema';
 
 @Injectable()
 export class PostService {
@@ -21,6 +22,13 @@ export class PostService {
     private readonly userService: UserService,
     private readonly cloudinaryService: CloudinaryService,
   ) {}
+
+  async findByIdAndUpdate(postId: string, update: UpdateQuery<PostDocument>) {
+    return this.postRepository.updateOne(
+      { _id: new mongoose.Types.ObjectId(postId) },
+      update,
+    );
+  }
 
   async findAllPosts(input: PaginationInput): Promise<PostConnection> {
     const { first = 5, after } = input;

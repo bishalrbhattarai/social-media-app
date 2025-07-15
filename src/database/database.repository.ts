@@ -4,6 +4,7 @@ import {
   ProjectionFields,
   SortOrder,
   Types,
+  UpdateQuery,
 } from 'mongoose';
 
 interface FindOptions {
@@ -14,6 +15,14 @@ interface FindOptions {
 
 export abstract class DatabaseRepository<T> {
   constructor(protected readonly model: Model<T>) {}
+
+  async updateOne(
+    filter: FilterQuery<T>,
+    update: UpdateQuery<T>,
+    options = { new: true },
+  ) {
+    return this.model.findByIdAndUpdate(filter, update, options);
+  }
 
   async findOne(
     filter: FilterQuery<T>,

@@ -48,7 +48,7 @@ export class FriendshipEdge {
   cursor: string;
 }
 
-@ObjectType('FriendshipPageInfo') // Renamed to avoid GraphQL naming conflicts
+@ObjectType('FriendshipPageInfo') 
 export class PageInfo {
   @Field(() => String, { nullable: true })
   endCursor?: string | null;

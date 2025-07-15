@@ -14,5 +14,6 @@ import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
     DatabaseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
   ],
   providers: [PostResolver, PostRepository, PostService],
+  exports:[PostService]
 })
 export class PostModule {}

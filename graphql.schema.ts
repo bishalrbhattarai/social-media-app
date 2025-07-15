@@ -46,6 +46,12 @@ export interface CreatePostInput {
     image?: Nullable<Upload>;
 }
 
+export interface CreateCommentInput {
+    postId: string;
+    content: string;
+    parentCommentId?: Nullable<string>;
+}
+
 export interface UserType {
     id: string;
     name: string;
@@ -164,6 +170,7 @@ export interface IMutation {
     sendFriendRequest(recipient: string): string | Promise<string>;
     handleFriendRequest(requesterId: string, action: FriendRequestAction): string | Promise<string>;
     removeFriend(friendId: string): string | Promise<string>;
+    createComment(input: CreateCommentInput): string | Promise<string>;
 }
 
 export type DateTime = any;

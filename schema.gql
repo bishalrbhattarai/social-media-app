@@ -144,6 +144,7 @@ type Mutation {
   sendFriendRequest(recipient: String!): String!
   handleFriendRequest(requesterId: String!, action: FriendRequestAction!): String!
   removeFriend(friendId: String!): String!
+  createComment(input: CreateCommentInput!): String!
 }
 
 input CreateUserInput {
@@ -169,4 +170,10 @@ scalar Upload
 enum FriendRequestAction {
   ACCEPT
   DECLINE
+}
+
+input CreateCommentInput {
+  postId: String!
+  content: String!
+  parentCommentId: String = null
 }

@@ -7,10 +7,11 @@ import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
 import { RedisCacheModule } from './redis-cache/redis-cache.module';
 import { EmailModule } from './email/email.module';
-import { JobModule } from './job/job.module';
 import { PostModule } from './post/post.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { FriendshipModule } from './friendship/friendship.module';
+import { CommentModule } from './comment/comment.module';
+import { JobModule } from './job/job.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { FriendshipModule } from './friendship/friendship.module';
     JobModule,
     PostModule,
     FriendshipModule,
+    CommentModule,
   ],
 })
 export class AppModule {}
