@@ -89,6 +89,7 @@ export interface RecentCommentType {
     content: string;
     authorId: string;
     authorName: string;
+    commentId: string;
 }
 
 export interface PostType {

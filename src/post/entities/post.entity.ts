@@ -10,6 +10,9 @@ export class RecentCommentType {
 
   @Field()
   authorName: string;
+
+  @Field()
+  commentId: string;
 }
 
 @ObjectType()

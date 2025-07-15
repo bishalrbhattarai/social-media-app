@@ -11,6 +11,9 @@ export class RecentComment {
 
   @Prop()
   authorName: string;
+
+  @Prop()
+  commentId:string
 }
 
 export const RecentCommentSchema = SchemaFactory.createForClass(RecentComment);

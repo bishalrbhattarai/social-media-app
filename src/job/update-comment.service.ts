@@ -10,12 +10,13 @@ export class UpdateCommentService {
     private readonly updateCommentQueue: Queue,
   ) {}
 
-  async addJob(authorId: string, authorName: string, content: string,postId:string) {
+  async addJob(authorId: string, authorName: string, content: string,postId:string,commentId:string) {
     this.updateCommentQueue.add('update-comment', {
       authorId,
       authorName,
       content,
-      postId
+      postId,
+      commentId
     });
   }
 }

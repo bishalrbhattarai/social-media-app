@@ -7,7 +7,7 @@ export class UpdateCommentProcessor {
 
   @Process('update-comment')
   async handleUpdateComment(job: any) {
-    const { authorId, authorName, content, postId } = job.data;
+    const { authorId, authorName, content, postId,commentId } = job.data;
     console.log('Processing update comment job:', {
       authorId,
       authorName,
@@ -25,6 +25,7 @@ export class UpdateCommentProcessor {
               authorId,
               authorName,
               content,
+              commentId
             },
           ],
           $slice: -MAX_RECENT_COMMENTS, 

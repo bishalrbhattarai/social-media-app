@@ -42,6 +42,7 @@ export class CommentService {
         createdComment.authorName,
         createdComment.content,
         postId,
+        String(createdComment._id),
       );
     }
 

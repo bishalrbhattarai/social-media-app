@@ -15,6 +15,7 @@ export function toPostType(post: PostDocument): PostType {
       content: comment.content,
       authorId: comment.authorId.toString(),
       authorName: comment.authorName,
+      commentId: comment.commentId,
     })),
   };
 }

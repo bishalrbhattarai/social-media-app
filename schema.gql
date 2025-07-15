@@ -45,6 +45,7 @@ type RecentCommentType {
   content: String!
   authorId: String!
   authorName: String!
+  commentId: String!
 }
 
 type PostType {
