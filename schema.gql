@@ -146,6 +146,7 @@ type Mutation {
   handleFriendRequest(requesterId: String!, action: FriendRequestAction!): String!
   removeFriend(friendId: String!): String!
   createComment(input: CreateCommentInput!): String!
+  deleteComment(input: DeleteCommentInput!): String!
 }
 
 input CreateUserInput {
@@ -177,4 +178,9 @@ input CreateCommentInput {
   postId: String!
   content: String!
   parentCommentId: String = null
+}
+
+input DeleteCommentInput {
+  postId: String!
+  commentId: String!
 }

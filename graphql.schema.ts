@@ -52,6 +52,11 @@ export interface CreateCommentInput {
     parentCommentId?: Nullable<string>;
 }
 
+export interface DeleteCommentInput {
+    postId: string;
+    commentId: string;
+}
+
 export interface UserType {
     id: string;
     name: string;
@@ -172,6 +177,7 @@ export interface IMutation {
     handleFriendRequest(requesterId: string, action: FriendRequestAction): string | Promise<string>;
     removeFriend(friendId: string): string | Promise<string>;
     createComment(input: CreateCommentInput): string | Promise<string>;
+    deleteComment(input: DeleteCommentInput): string | Promise<string>;
 }
 
 export type DateTime = any;
