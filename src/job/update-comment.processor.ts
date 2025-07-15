@@ -15,12 +15,19 @@ export class UpdateCommentProcessor {
       postId,
     });
 
+    const MAX_RECENT_COMMENTS = 5;
+
     await this.postService.findByIdAndUpdate(postId, {
       $push: {
         recentComments: {
-          authorId,
-          authorName,
-          content,
+          $each: [
+            {
+              authorId,
+              authorName,
+              content,
+            },
+          ],
+          $slice: -MAX_RECENT_COMMENTS, 
         },
       },
     });
