@@ -236,6 +236,12 @@ export interface IMutation {
     deleteComment(input: DeleteCommentInput): string | Promise<string>;
     createMessage(conversationId: string, content: string): MessageType | Promise<MessageType>;
     createConversation(receiverId: string): ConversationType | Promise<ConversationType>;
+    triggerCommentNotification(userId: string, message: string): string | Promise<string>;
+}
+
+export interface ISubscription {
+    messageAdded(conversationId: string): MessageType | Promise<MessageType>;
+    commentAdded(userId: string): string | Promise<string>;
 }
 
 export type DateTime = any;

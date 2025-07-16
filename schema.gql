@@ -205,6 +205,7 @@ type Mutation {
   deleteComment(input: DeleteCommentInput!): String!
   createMessage(conversationId: String!, content: String!): MessageType!
   createConversation(receiverId: String!): ConversationType!
+  triggerCommentNotification(userId: String!, message: String!): String!
 }
 
 input CreateUserInput {
@@ -241,4 +242,9 @@ input CreateCommentInput {
 input DeleteCommentInput {
   postId: String!
   commentId: String!
+}
+
+type Subscription {
+  messageAdded(conversationId: String!): MessageType!
+  commentAdded(userId: String!): String!
 }

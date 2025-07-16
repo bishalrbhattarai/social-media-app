@@ -2,6 +2,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  Inject,
 } from '@nestjs/common';
 import { Types } from 'mongoose';
 import { User } from 'src/auth/resolvers/auth.resolver';
@@ -13,6 +14,8 @@ import {
   MessageEdge,
   MessageType,
 } from '../entities/message.entity';
+import { PUB_SUB } from 'src/pubsub/pubsub.provider';
+import { RedisPubSub } from 'graphql-redis-subscriptions';
 
 @Injectable()
 export class MessageService {
@@ -20,6 +23,7 @@ export class MessageService {
     private readonly messageRepository: MessageRepository,
     private readonly conversationRepository: ConversationRepository,
     private readonly userService: UserService,
+    @Inject(PUB_SUB) private readonly pubSub: RedisPubSub,
   ) {}
 
   async createMessage(
@@ -69,7 +73,7 @@ export class MessageService {
       },
     );
 
-    return {
+    const messageResult = {
       id: String(createdMessage._id),
       conversationId: createdMessage.conversationId.toString(),
       senderId: createdMessage.senderId.toString(),
@@ -80,6 +84,14 @@ export class MessageService {
       createdAt: createdMessage.createdAt,
       updatedAt: createdMessage.updatedAt,
     };
+
+    // 🚀 Publish the new message to all conversation participants
+    await this.pubSub.publish(`messageAdded.${conversationId}`, {
+      messageAdded: messageResult,
+      conversationId,
+    });
+
+    return messageResult;
   }
 
   async getMessagesConnection(
@@ -139,5 +151,16 @@ export class MessageService {
         hasNextPage,
       },
     };
+  }
+
+  async verifyConversationAccess(
+    userId: string,
+    conversationId: string,
+  ): Promise<boolean> {
+    const conversation = await this.conversationRepository.findOne({
+      _id: new Types.ObjectId(conversationId),
+      'participants.userId': userId,
+    });
+    return !!conversation;
   }
 }
