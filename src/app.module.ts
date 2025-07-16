@@ -13,6 +13,7 @@ import { FriendshipModule } from './friendship/friendship.module';
 import { CommentModule } from './comment/comment.module';
 import { JobModule } from './job/job.module';
 import { LikeModule } from './like/like.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { LikeModule } from './like/like.module';
     FriendshipModule,
     CommentModule,
     LikeModule,
+    ChatModule,
   ],
 })
 export class AppModule {}

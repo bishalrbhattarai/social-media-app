@@ -159,6 +159,41 @@ export interface FriendshipConnection {
     pageInfo: FriendshipPageInfo;
 }
 
+export interface ConversationParticipantType {
+    userId: string;
+    name: string;
+    avatar?: Nullable<string>;
+}
+
+export interface RecentMessageType {
+    senderId: string;
+    senderName: string;
+    senderAvatar?: Nullable<string>;
+    content: string;
+    createdAt: DateTime;
+}
+
+export interface ConversationType {
+    id: string;
+    participants: ConversationParticipantType[];
+    recentMessages: RecentMessageType[];
+    lastMessageAt?: Nullable<DateTime>;
+    createdAt: DateTime;
+    updatedAt: DateTime;
+}
+
+export interface MessageType {
+    id: string;
+    conversationId: string;
+    senderId: string;
+    senderName: string;
+    senderAvatar?: Nullable<string>;
+    content: string;
+    read: boolean;
+    createdAt: DateTime;
+    updatedAt: DateTime;
+}
+
 export interface IQuery {
     check(): string | Promise<string>;
     me(): string | Promise<string>;
@@ -183,6 +218,8 @@ export interface IMutation {
     removeFriend(friendId: string): string | Promise<string>;
     createComment(input: CreateCommentInput): string | Promise<string>;
     deleteComment(input: DeleteCommentInput): string | Promise<string>;
+    createMessage(conversationId: string, content: string): MessageType | Promise<MessageType>;
+    createConversation(receiverId: string): ConversationType | Promise<ConversationType>;
 }
 
 export type DateTime = any;

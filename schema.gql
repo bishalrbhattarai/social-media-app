@@ -123,6 +123,41 @@ type FriendshipConnection {
   pageInfo: FriendshipPageInfo!
 }
 
+type ConversationParticipantType {
+  userId: ID!
+  name: String!
+  avatar: String
+}
+
+type RecentMessageType {
+  senderId: ID!
+  senderName: String!
+  senderAvatar: String
+  content: String!
+  createdAt: DateTime!
+}
+
+type ConversationType {
+  id: ID!
+  participants: [ConversationParticipantType!]!
+  recentMessages: [RecentMessageType!]!
+  lastMessageAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type MessageType {
+  id: ID!
+  conversationId: ID!
+  senderId: ID!
+  senderName: String!
+  senderAvatar: String
+  content: String!
+  read: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type Query {
   check: String!
   me: String!
@@ -152,6 +187,8 @@ type Mutation {
   removeFriend(friendId: String!): String!
   createComment(input: CreateCommentInput!): String!
   deleteComment(input: DeleteCommentInput!): String!
+  createMessage(conversationId: String!, content: String!): MessageType!
+  createConversation(receiverId: String!): ConversationType!
 }
 
 input CreateUserInput {
