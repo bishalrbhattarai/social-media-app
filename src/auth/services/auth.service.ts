@@ -17,6 +17,7 @@ import { LogoutResponse } from '../response/logout-response';
 import { EmailVerificationJobService } from 'src/job/email-verification.service';
 import { v4 as uuidv4 } from 'uuid';
 import { EmailVerificationResponse } from '../response/email-verification-response';
+import { User } from '../resolvers/auth.resolver';
 
 @Injectable()
 export class AuthService {
@@ -37,7 +38,8 @@ export class AuthService {
     if (!_id) throw new BadRequestException('Invalid email-verification-token');
     const user = await this.userService.findOneById(_id);
     if (!user) throw new NotFoundException('User not found');
-    if (user.isEmailVerified) throw new BadRequestException('Email already verified');
+    if (user.isEmailVerified)
+      throw new BadRequestException('Email already verified');
     user.isEmailVerified = true;
     await user.save();
     await this.cacheService.del(`email-verification:${token}`);
@@ -149,6 +151,30 @@ export class AuthService {
       secure: false,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
+  }
+
+  async generateEmailVerificationToken(email: string) {
+    const user = await this.userService.findOne({
+      isEmailVerified: false,
+      email,
+    });
+
+    if (!user)
+      throw new NotFoundException('User not found or already verified');
+
+    const token = uuidv4();
+    await this.cacheService.set(
+      `email-verification:${token}`,
+      user._id,
+      30 * 60 * 1000,
+    );
+
+    this.emailVerificationJobService.addJob(email, token);
+
+    return {
+      message:
+        'Email verification token generated successfully check your email',
+    };
   }
 
   async register(input: CreateUserInput): Promise<RegisterResponse> {

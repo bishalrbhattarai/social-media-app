@@ -2,11 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { UserRepository } from '../repositories/user.repository';
 import { UserDocument } from '../entities/user.schema';
 import { CreateUserInput } from 'src/auth/dtos/auth.dto';
-import { ProjectionFields } from 'mongoose';
+import { FilterQuery, ProjectionFields } from 'mongoose';
 
 @Injectable()
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
+
+  async findOne(filter: FilterQuery<UserDocument> = {}) {
+    return this.userRepository.findOne(filter);
+  }
 
   async findOneByEmail(
     email: string,

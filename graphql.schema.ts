@@ -168,6 +168,7 @@ export interface IQuery {
 }
 
 export interface IMutation {
+    generateEmailVerificationToken(email: string): EmailVerificationResponse | Promise<EmailVerificationResponse>;
     verifyEmailToken(): EmailVerificationResponse | Promise<EmailVerificationResponse>;
     register(input: CreateUserInput): RegisterResponse | Promise<RegisterResponse>;
     refreshAccessToken(): RefreshTokenResponse | Promise<RefreshTokenResponse>;

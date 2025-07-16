@@ -34,6 +34,13 @@ export class AuthResolver {
   }
 
   @Mutation(() => EmailVerificationResponse)
+  generateEmailVerificationToken(
+    @Args('email') email: string,
+  ): Promise<EmailVerificationResponse> {
+    return this.authService.generateEmailVerificationToken(email);
+  }
+
+  @Mutation(() => EmailVerificationResponse)
   verifyEmailToken(
     @Context() { req }: GqlContext,
   ): Promise<EmailVerificationResponse> {
