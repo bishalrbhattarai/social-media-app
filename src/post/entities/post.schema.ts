@@ -13,7 +13,7 @@ export class RecentComment {
   authorName: string;
 
   @Prop()
-  commentId:string
+  commentId: string;
 }
 
 export const RecentCommentSchema = SchemaFactory.createForClass(RecentComment);
@@ -40,6 +40,7 @@ export class Post {
 
   @Prop({ type: [RecentComment], default: [] })
   recentComments: RecentComment[];
+
 }
 
 export type PostDocument = Post & Document;

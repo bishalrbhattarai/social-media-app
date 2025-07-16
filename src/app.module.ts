@@ -12,6 +12,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { FriendshipModule } from './friendship/friendship.module';
 import { CommentModule } from './comment/comment.module';
 import { JobModule } from './job/job.module';
+import { LikeModule } from './like/like.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { JobModule } from './job/job.module';
     PostModule,
     FriendshipModule,
     CommentModule,
+    LikeModule,
   ],
 })
 export class AppModule {}

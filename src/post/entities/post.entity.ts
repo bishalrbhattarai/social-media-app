@@ -40,6 +40,7 @@ export class PostType {
 
   @Field(() => [RecentCommentType], { defaultValue: [], nullable: true })
   recentComments: RecentCommentType[];
+
 }
 
 @ObjectType()
@@ -53,7 +54,7 @@ export class PostEdge {
 
 @ObjectType()
 export class PageInfo {
-  @Field(()=>String,{ nullable: true })
+  @Field(() => String, { nullable: true })
   endCursor?: string | null;
 
   @Field()
