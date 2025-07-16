@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, forwardRef, Inject } from '@nestjs/common';
 import { LikeRepository } from '../repositories/like.repository';
 import { User } from 'src/auth/resolvers/auth.resolver';
 import { Types } from 'mongoose';
@@ -8,8 +8,21 @@ import { PostService } from 'src/post/services/post.service';
 export class LikeService {
   constructor(
     private readonly likeRepository: LikeRepository,
+    @Inject(forwardRef(() => PostService))
     private readonly postService: PostService,
   ) {}
+
+
+  async findLikesByUserForPosts(userId: string, postIds: string[]) {
+    return this.likeRepository.find(
+      {
+        userId,
+        postId: { $in: postIds },
+      },
+      { first: postIds.length }, 
+    );
+  }
+
 
   async likePost(user: User, postId: string): Promise<string> {
     const existingLike = await this.likeRepository.findOne({
@@ -35,8 +48,13 @@ export class LikeService {
     const userId = new Types.ObjectId(user._id);
 
     const deleted = await this.likeRepository.delete({ userId, postId });
+
     if (!deleted)
       throw new BadRequestException('You have not liked this post yet.');
+
+    await this.postService.findByIdAndUpdate(postId, {
+      $inc: { likes: -1 },
+    });
 
     return `Like removed from post ${postId} by user ${user._id}`;
   }

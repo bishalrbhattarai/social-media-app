@@ -57,6 +57,7 @@ type PostType {
   likes: Float!
   commentsCount: Float!
   recentComments: [RecentCommentType!]
+  isLikedByMe: Boolean
 }
 
 type PostEdge {
@@ -143,6 +144,8 @@ type Mutation {
   login(input: LoginUserInput!): LoginResponse!
   createPost(input: CreatePostInput!): CreatePostResponse!
   deletePost(id: String!): DeletePostResponse!
+  likePost(postId: String!): String!
+  unlikePost(postId: String!): String!
   sendFriendRequest(recipient: String!): String!
   handleFriendRequest(requesterId: String!, action: FriendRequestAction!): String!
   removeFriend(friendId: String!): String!

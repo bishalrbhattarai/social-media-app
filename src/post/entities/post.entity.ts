@@ -41,6 +41,11 @@ export class PostType {
   @Field(() => [RecentCommentType], { defaultValue: [], nullable: true })
   recentComments: RecentCommentType[];
 
+
+  @Field(()=>Boolean,{ nullable:true,defaultValue:false})
+  isLikedByMe?:boolean
+
+
 }
 
 @ObjectType()

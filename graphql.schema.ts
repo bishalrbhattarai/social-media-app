@@ -106,6 +106,7 @@ export interface PostType {
     likes: number;
     commentsCount: number;
     recentComments?: Nullable<RecentCommentType[]>;
+    isLikedByMe?: Nullable<boolean>;
 }
 
 export interface PostEdge {
@@ -174,6 +175,8 @@ export interface IMutation {
     login(input: LoginUserInput): LoginResponse | Promise<LoginResponse>;
     createPost(input: CreatePostInput): CreatePostResponse | Promise<CreatePostResponse>;
     deletePost(id: string): DeletePostResponse | Promise<DeletePostResponse>;
+    likePost(postId: string): string | Promise<string>;
+    unlikePost(postId: string): string | Promise<string>;
     sendFriendRequest(recipient: string): string | Promise<string>;
     handleFriendRequest(requesterId: string, action: FriendRequestAction): string | Promise<string>;
     removeFriend(friendId: string): string | Promise<string>;

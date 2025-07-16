@@ -14,6 +14,7 @@ import { PostConnection, PostEdge } from '../entities/post.entity';
 import { PaginationInput } from '../dtos/pagination.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { PostDocument } from '../entities/post.schema';
+import { LikeService } from 'src/like/services/like.service';
 
 @Injectable()
 export class PostService {
@@ -21,6 +22,7 @@ export class PostService {
     private readonly postRepository: PostRepository,
     private readonly userService: UserService,
     private readonly cloudinaryService: CloudinaryService,
+    private readonly likeService: LikeService, 
   ) {}
 
   async findByIdAndUpdate(postId: string, update: UpdateQuery<PostDocument>) {
@@ -30,7 +32,7 @@ export class PostService {
     );
   }
 
-  async findAllPosts(input: PaginationInput): Promise<PostConnection> {
+  async findAllPosts(input: PaginationInput,user:User): Promise<PostConnection> {
     const { first = 5, after } = input;
 
     const posts = await this.postRepository.find(
@@ -41,8 +43,25 @@ export class PostService {
 
     const slicedPosts = hasNextPage ? posts.slice(0, first) : posts;
 
+    console.log("yaha samma ayo code:");
+
+    const postIds = slicedPosts.map((p) => String(p._id));
+
+
+    const likedDocs = await this.likeService.findLikesByUserForPosts(
+      user._id,
+      postIds,
+    );
+
+    const likedPostIds = new Set(likedDocs.map((like) => like.postId.toString()));
+
+    console.log(likedPostIds);
+
+
     const edges: PostEdge[] = slicedPosts.map((post) => ({
-      node: toPostType(post),
+      node:{ ...toPostType(post),
+        isLikedByMe: likedPostIds.has(String(post._id)),
+       } ,
       cursor: String(post._id),
     }));
 
@@ -62,22 +81,35 @@ export class PostService {
     input: PaginationInput,
   ): Promise<PostConnection> {
     const { first = 5, after } = input;
-
+  
     const posts = await this.postRepository.find(
       { authorId: new mongoose.Types.ObjectId(user._id) },
       { first: first + 1, after },
     );
+  
     const hasNextPage = posts.length > first;
-
     const slicedPosts = hasNextPage ? posts.slice(0, first) : posts;
-
+  
+    const postIds = slicedPosts.map((p) => String(p._id));
+  
+    const likedDocs = await this.likeService.findLikesByUserForPosts(
+      user._id,
+      postIds,
+    );
+  
+    const likedPostIds = new Set(likedDocs.map((like) => like.postId.toString()));
+    console.log(likedPostIds);
+  
     const edges: PostEdge[] = slicedPosts.map((post) => ({
-      node: toPostType(post),
+      node: {
+        ...toPostType(post),
+        isLikedByMe: likedPostIds.has(String(post._id)),
+      },
       cursor: String(post._id),
     }));
-
+  
     const endCursor = edges.length > 0 ? edges[edges.length - 1].cursor : null;
-
+  
     return {
       edges,
       pageInfo: {
@@ -86,6 +118,7 @@ export class PostService {
       },
     };
   }
+  
 
   async deletePost(id: string) {
     const deletedPost = await this.postRepository.delete({

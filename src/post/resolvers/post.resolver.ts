@@ -11,11 +11,11 @@ import { PaginationInput } from '../dtos/pagination.dto';
 import { DeletePostResponse } from '../response/delete-post.response';
 
 @Resolver()
+@UseGuards(AuthGuard)
 export class PostResolver {
   constructor(private readonly postService: PostService) {}
 
   @Mutation(() => CreatePostResponse)
-  @UseGuards(AuthGuard)
   createPost(
     @CurrentUser() user: User,
     @Args('input') input: CreatePostInput,
@@ -25,14 +25,14 @@ export class PostResolver {
 
   @Query(() => PostConnection)
   async posts(
+    @CurrentUser() user: User,
     @Args('input', { nullable: true, defaultValue: { first: 5 } })
     input: PaginationInput,
   ): Promise<PostConnection> {
-    return this.postService.findAllPosts(input);
+    return this.postService.findAllPosts(input,user);
   }
 
   @Query(() => PostConnection)
-  @UseGuards(AuthGuard)
   async myPosts(
     @CurrentUser() user: User,
     @Args('input', { nullable: true, defaultValue: { first: 5 } })
@@ -42,7 +42,6 @@ export class PostResolver {
   }
 
   @Mutation(() => DeletePostResponse)
-  @UseGuards(AuthGuard)
   async deletePost(@Args('id') id: string): Promise<DeletePostResponse> {
     return this.postService.deletePost(id);
   }

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { LikeService } from './services/like.service';
 import { LikeResolver } from './resolvers/like.resolver';
 import { LikeRepository } from './repositories/like.repository';
@@ -8,7 +8,7 @@ import { PostModule } from 'src/post/post.module';
 
 @Module({
   imports: [
-    PostModule,
+    forwardRef(() => PostModule),
     DatabaseModule.forFeature([
       {
         name: Like.name,
