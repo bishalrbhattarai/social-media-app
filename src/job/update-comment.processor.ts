@@ -35,4 +35,27 @@ export class UpdateCommentProcessor {
 
     console.log('recent comment added to post:', postId);
   }
+
+
+  @Process("remove-comment")
+  async handleRemoveComment(job:any) {
+    const { authorId, authorName, content, commentId, postId } = job.data;
+    console.log('Processing remove comment job:', {
+      authorId,
+      authorName,
+      content,
+      postId,
+    });
+
+    await this.postService.findByIdAndUpdate(postId, {
+      $pull: {
+        recentComments: { commentId },
+      },
+    });
+
+    console.log('recent comment removed from post:', postId);
+  }
+
+
+
 }

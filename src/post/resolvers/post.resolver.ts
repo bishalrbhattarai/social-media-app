@@ -12,7 +12,7 @@ import { DeletePostResponse } from '../response/delete-post.response';
 
 @Resolver()
 export class PostResolver {
-  constructor(private readonly postService: PostService) { }
+  constructor(private readonly postService: PostService) {}
 
   @Mutation(() => CreatePostResponse)
   @UseGuards(AuthGuard)
@@ -31,14 +31,19 @@ export class PostResolver {
     return this.postService.findAllPosts(input);
   }
 
-
+  @Query(() => PostConnection)
+  @UseGuards(AuthGuard)
+  async myPosts(
+    @CurrentUser() user: User,
+    @Args('input', { nullable: true, defaultValue: { first: 5 } })
+    input: PaginationInput,
+  ): Promise<PostConnection> {
+    return this.postService.findMyPosts(user, input);
+  }
 
   @Mutation(() => DeletePostResponse)
   @UseGuards(AuthGuard)
-  async deletePost(
-    @Args('id') id: string,
-  ): Promise<DeletePostResponse> {
+  async deletePost(@Args('id') id: string): Promise<DeletePostResponse> {
     return this.postService.deletePost(id);
-    
   }
 }

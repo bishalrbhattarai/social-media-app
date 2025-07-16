@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CommentRepository } from '../repositories/comment.repository';
 import { User } from 'src/auth/resolvers/auth.resolver';
 import { UserService } from 'src/user/services/user.service';
@@ -37,7 +41,7 @@ export class CommentService {
     });
 
     if (!createdComment.parentCommentId) {
-      this.updateCommentService.addJob(
+      this.updateCommentService.addCommentJob(
         createdComment.authorId,
         createdComment.authorName,
         createdComment.content,
@@ -59,13 +63,10 @@ export class CommentService {
       postId,
     });
 
-    if (!comment) {
-      throw new NotFoundException('Comment not found');
-    }
+    if (!comment) throw new NotFoundException('Comment not found');
 
-    if (comment.authorId.toString() !== user._id) {
+    if (comment.authorId.toString() !== user._id)
       throw new UnauthorizedException('You can only delete your own comments');
-    }
 
     await this.commentRepository.delete({
       _id: new mongoose.Types.ObjectId(commentId),
@@ -75,15 +76,13 @@ export class CommentService {
       $inc: { commentsCount: -1 },
     });
 
-    await this.postService.findByIdAndUpdate(postId, {
-      $pull: {
-        recentComments: {
-          authorId: new mongoose.Types.ObjectId(user._id),
-          authorName: comment.authorName,
-          content: comment.content,
-        },
-      },
-    });
+    this.updateCommentService.removeCommentJob(
+      new mongoose.Types.ObjectId(user._id),
+      comment.authorName,
+      comment.content,
+      commentId,
+      postId,
+    );
 
     return 'Comment deleted successfully';
   }

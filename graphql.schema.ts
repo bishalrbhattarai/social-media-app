@@ -162,6 +162,7 @@ export interface IQuery {
     check(): string | Promise<string>;
     me(): string | Promise<string>;
     posts(input?: Nullable<PaginationInput>): PostConnection | Promise<PostConnection>;
+    myPosts(input?: Nullable<PaginationInput>): PostConnection | Promise<PostConnection>;
     myFriends(first?: Nullable<number>, after?: Nullable<string>): FriendshipConnection | Promise<FriendshipConnection>;
 }
 

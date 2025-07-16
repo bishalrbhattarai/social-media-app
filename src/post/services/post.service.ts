@@ -57,6 +57,36 @@ export class PostService {
     };
   }
 
+  async findMyPosts(
+    user: User,
+    input: PaginationInput,
+  ): Promise<PostConnection> {
+    const { first = 5, after } = input;
+
+    const posts = await this.postRepository.find(
+      { authorId: new mongoose.Types.ObjectId(user._id) },
+      { first: first + 1, after },
+    );
+    const hasNextPage = posts.length > first;
+
+    const slicedPosts = hasNextPage ? posts.slice(0, first) : posts;
+
+    const edges: PostEdge[] = slicedPosts.map((post) => ({
+      node: toPostType(post),
+      cursor: String(post._id),
+    }));
+
+    const endCursor = edges.length > 0 ? edges[edges.length - 1].cursor : null;
+
+    return {
+      edges,
+      pageInfo: {
+        endCursor,
+        hasNextPage,
+      },
+    };
+  }
+
   async deletePost(id: string) {
     const deletedPost = await this.postRepository.delete({
       _id: new mongoose.Types.ObjectId(id),

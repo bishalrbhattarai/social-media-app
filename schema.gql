@@ -126,6 +126,7 @@ type Query {
   check: String!
   me: String!
   posts(input: PaginationInput = {first: 5}): PostConnection!
+  myPosts(input: PaginationInput = {first: 5}): PostConnection!
   myFriends(first: Int, after: String): FriendshipConnection!
 }
 
