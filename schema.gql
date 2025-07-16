@@ -158,12 +158,28 @@ type MessageType {
   updatedAt: DateTime!
 }
 
+type MessageEdge {
+  node: MessageType!
+  cursor: String!
+}
+
+type MessagePageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+}
+
+type MessageConnection {
+  edges: [MessageEdge!]!
+  pageInfo: MessagePageInfo!
+}
+
 type Query {
   check: String!
   me: String!
   posts(input: PaginationInput = {first: 5}): PostConnection!
   myPosts(input: PaginationInput = {first: 5}): PostConnection!
   myFriends(first: Int, after: String): FriendshipConnection!
+  getMessages(conversationId: String!, first: Float = 10, after: String): MessageConnection!
 }
 
 input PaginationInput {

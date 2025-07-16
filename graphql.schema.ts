@@ -194,12 +194,28 @@ export interface MessageType {
     updatedAt: DateTime;
 }
 
+export interface MessageEdge {
+    node: MessageType;
+    cursor: string;
+}
+
+export interface MessagePageInfo {
+    endCursor?: Nullable<string>;
+    hasNextPage: boolean;
+}
+
+export interface MessageConnection {
+    edges: MessageEdge[];
+    pageInfo: MessagePageInfo;
+}
+
 export interface IQuery {
     check(): string | Promise<string>;
     me(): string | Promise<string>;
     posts(input?: Nullable<PaginationInput>): PostConnection | Promise<PostConnection>;
     myPosts(input?: Nullable<PaginationInput>): PostConnection | Promise<PostConnection>;
     myFriends(first?: Nullable<number>, after?: Nullable<string>): FriendshipConnection | Promise<FriendshipConnection>;
+    getMessages(conversationId: string, first?: Nullable<number>, after?: Nullable<string>): MessageConnection | Promise<MessageConnection>;
 }
 
 export interface IMutation {
