@@ -14,6 +14,7 @@ import { CommentModule } from './comment/comment.module';
 import { JobModule } from './job/job.module';
 import { LikeModule } from './like/like.module';
 import { ChatModule } from './chat/chat.module';
+import { PubsubModule } from './pubsub/pubsub.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { ChatModule } from './chat/chat.module';
     CommentModule,
     LikeModule,
     ChatModule,
+    PubsubModule,
   ],
 })
 export class AppModule {}
