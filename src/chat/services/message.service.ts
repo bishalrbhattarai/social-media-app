@@ -96,7 +96,6 @@ export class MessageService {
 
     const baseQuery = { conversationId };
 
-    console.log(typeof baseQuery.conversationId);
     const cursorFilter = after
       ? { _id: { $lt: new Types.ObjectId(after) } }
       : {};

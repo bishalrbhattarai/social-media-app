@@ -16,6 +16,13 @@ import { GqlContext } from 'src/auth/resolvers/auth.resolver';
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
       context: ({ req, res }): GqlContext => ({ req, res }),
       csrfPrevention: false,
+      subscriptions: {
+        'graphql-ws': {
+          onConnect: (context) => {
+            console.log('🔌 WebSocket connected');
+          },
+        },
+      },
     }),
   ],
 })
