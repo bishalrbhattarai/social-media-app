@@ -85,7 +85,7 @@ export class MessageService {
       updatedAt: createdMessage.updatedAt,
     };
 
-    // 🚀 Publish the new message to all conversation participants
+
     await this.pubSub.publish(`messageAdded.${conversationId}`, {
       messageAdded: messageResult,
       conversationId,

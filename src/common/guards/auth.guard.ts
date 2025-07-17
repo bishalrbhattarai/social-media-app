@@ -30,14 +30,14 @@ export class AuthGuard implements CanActivate {
     if (!payload.isEmailVerified)
       throw new ForbiddenError('Email is not verified');
 
-    const cacheValue = await this.cacheService.get<string>(
-      `access-token:${payload.jti}`,
-    );
+    // const cacheValue = await this.cacheService.get<string>(
+    //   `access-token:${payload.jti}`,
+    // );
 
-    if (!cacheValue) throw new UnauthorizedException('Unauthorized User');
+    // if (!cacheValue) throw new UnauthorizedException('Unauthorized User');
 
-    if (cacheValue !== token)
-      throw new UnauthorizedException('Unauthorized User');
+    // if (cacheValue !== token)
+    //   throw new UnauthorizedException('Unauthorized User');
     request.user = { ...payload, _id: payload.sub };
     return true;
   }

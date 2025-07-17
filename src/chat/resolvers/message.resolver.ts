@@ -43,19 +43,25 @@ export class MessageResolver {
 
   @Subscription(() => MessageType, {
     filter: (payload, variables, context) => {
-      // Check if the message is for the right conversation
+
+      console.log(`the context is`);
+      console.log(context);
+
+      console.log("the payload");
+      console.log(payload);
+
       if (payload.conversationId !== variables.conversationId) {
         return false;
       }
 
-      // Additional security: verify user exists in context
+  
+
       const user = context.user;
       if (!user || !user._id) {
         console.log('Subscription rejected: No authenticated user');
         return false;
       }
 
-      // If we reach here, user is authenticated and conversation matches
       return true;
     },
   })
