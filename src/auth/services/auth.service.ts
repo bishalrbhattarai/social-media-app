@@ -22,7 +22,7 @@ import { User } from '../resolvers/auth.resolver';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userService: UserService,
+  private readonly userService: UserService,
     private readonly passwordService: PasswordService,
     private readonly tokenService: TokenService,
     private readonly cacheService: CacheService,
@@ -198,7 +198,7 @@ export class AuthService {
     this.emailVerificationJobService.addJob(createdUser.email, token);
     return {
       user: createdUser,
-      message: 'User registration successfully',
+      message: 'User registration successfully. Please verify your email.',
     };
   }
 }

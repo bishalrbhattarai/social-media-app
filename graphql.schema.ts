@@ -46,6 +46,11 @@ export interface CreatePostInput {
     image?: Nullable<Upload>;
 }
 
+export interface UpdatePostInput {
+    description?: Nullable<string>;
+    image?: Nullable<Upload>;
+}
+
 export interface CreateCommentInput {
     postId: string;
     content: string;
@@ -131,6 +136,11 @@ export interface CreatePostResponse {
 
 export interface DeletePostResponse {
     message: string;
+}
+
+export interface UpdatePostResponse {
+    message: string;
+    post: PostType;
 }
 
 export interface FriendshipType {
@@ -227,6 +237,7 @@ export interface IMutation {
     login(input: LoginUserInput): LoginResponse | Promise<LoginResponse>;
     createPost(input: CreatePostInput): CreatePostResponse | Promise<CreatePostResponse>;
     deletePost(id: string): DeletePostResponse | Promise<DeletePostResponse>;
+    updatePost(postId: string, input: UpdatePostInput): UpdatePostResponse | Promise<UpdatePostResponse>;
     likePost(postId: string): string | Promise<string>;
     unlikePost(postId: string): string | Promise<string>;
     sendFriendRequest(recipient: string): string | Promise<string>;

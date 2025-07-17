@@ -4,17 +4,18 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { PostRepository } from '../repositories/post.repository';
-import { CreatePostInput } from '../dtos/post.dto';
+import { CreatePostInput, UpdatePostInput } from '../dtos/post.dto';
 import { User } from 'src/auth/resolvers/auth.resolver';
 import mongoose, { UpdateQuery } from 'mongoose';
 import { UserService } from 'src/user/services/user.service';
 import { CreatePostResponse } from '../response/create-post.response';
 import { toPostType } from '../mappers/post.mapper';
-import { PostConnection, PostEdge } from '../entities/post.entity';
+import { PostConnection, PostEdge, PostType } from '../entities/post.entity';
 import { PaginationInput } from '../dtos/pagination.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { PostDocument } from '../entities/post.schema';
 import { LikeService } from 'src/like/services/like.service';
+import { UpdatePostResponse } from '../response/update-post.response';
 
 @Injectable()
 export class PostService {
@@ -22,7 +23,7 @@ export class PostService {
     private readonly postRepository: PostRepository,
     private readonly userService: UserService,
     private readonly cloudinaryService: CloudinaryService,
-    private readonly likeService: LikeService, 
+    private readonly likeService: LikeService,
   ) {}
 
   async findByIdAndUpdate(postId: string, update: UpdateQuery<PostDocument>) {
@@ -32,7 +33,10 @@ export class PostService {
     );
   }
 
-  async findAllPosts(input: PaginationInput,user:User): Promise<PostConnection> {
+  async findAllPosts(
+    input: PaginationInput,
+    user: User,
+  ): Promise<PostConnection> {
     const { first = 5, after } = input;
 
     const posts = await this.postRepository.find(
@@ -43,25 +47,26 @@ export class PostService {
 
     const slicedPosts = hasNextPage ? posts.slice(0, first) : posts;
 
-    console.log("yaha samma ayo code:");
+    console.log('yaha samma ayo code:');
 
     const postIds = slicedPosts.map((p) => String(p._id));
-
 
     const likedDocs = await this.likeService.findLikesByUserForPosts(
       user._id,
       postIds,
     );
 
-    const likedPostIds = new Set(likedDocs.map((like) => like.postId.toString()));
+    const likedPostIds = new Set(
+      likedDocs.map((like) => like.postId.toString()),
+    );
 
     console.log(likedPostIds);
 
-
     const edges: PostEdge[] = slicedPosts.map((post) => ({
-      node:{ ...toPostType(post),
+      node: {
+        ...toPostType(post),
         isLikedByMe: likedPostIds.has(String(post._id)),
-       } ,
+      },
       cursor: String(post._id),
     }));
 
@@ -81,25 +86,27 @@ export class PostService {
     input: PaginationInput,
   ): Promise<PostConnection> {
     const { first = 5, after } = input;
-  
+
     const posts = await this.postRepository.find(
       { authorId: new mongoose.Types.ObjectId(user._id) },
       { first: first + 1, after },
     );
-  
+
     const hasNextPage = posts.length > first;
     const slicedPosts = hasNextPage ? posts.slice(0, first) : posts;
-  
+
     const postIds = slicedPosts.map((p) => String(p._id));
-  
+
     const likedDocs = await this.likeService.findLikesByUserForPosts(
       user._id,
       postIds,
     );
-  
-    const likedPostIds = new Set(likedDocs.map((like) => like.postId.toString()));
+
+    const likedPostIds = new Set(
+      likedDocs.map((like) => like.postId.toString()),
+    );
     console.log(likedPostIds);
-  
+
     const edges: PostEdge[] = slicedPosts.map((post) => ({
       node: {
         ...toPostType(post),
@@ -107,9 +114,9 @@ export class PostService {
       },
       cursor: String(post._id),
     }));
-  
+
     const endCursor = edges.length > 0 ? edges[edges.length - 1].cursor : null;
-  
+
     return {
       edges,
       pageInfo: {
@@ -118,12 +125,12 @@ export class PostService {
       },
     };
   }
-  
 
   async deletePost(id: string) {
     const deletedPost = await this.postRepository.delete({
       _id: new mongoose.Types.ObjectId(id),
     });
+
     if (!deletedPost)
       throw new NotFoundException('Post not found or already deleted');
 
@@ -156,6 +163,43 @@ export class PostService {
     return {
       message: 'Post created successfully',
       post: toPostType(createdPost),
+    };
+  }
+
+  async updatePost(
+    postId: string,
+    updatedPostInput: UpdatePostInput,
+    user: User,
+  ): Promise<UpdatePostResponse> {
+    const post = await this.postRepository.findOne({
+      _id: new mongoose.Types.ObjectId(postId),
+      authorId: new mongoose.Types.ObjectId(user._id),
+    });
+
+    if (!post)
+      throw new NotFoundException('Post not found or you are not the author');
+
+    if (updatedPostInput.image) {
+      const file = await updatedPostInput.image;
+      const uploadResult = await this.cloudinaryService.uploadStream(file);
+      const imageUrl = uploadResult.secure_url;
+      updatedPostInput.image = imageUrl;
+    }
+
+    const updatedPost = await this.postRepository.updateOne(
+      {
+        _id: new mongoose.Types.ObjectId(postId),
+        authorId: new mongoose.Types.ObjectId(user._id),
+      },
+      updatedPostInput,
+    );
+
+    if (!updatedPost)
+      throw new NotFoundException('Post not found or update failed');
+
+    return {
+      message: 'Post updated successfully',
+      post: toPostType(updatedPost),
     };
   }
 }

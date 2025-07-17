@@ -11,5 +11,18 @@ export class CreatePostInput {
 
   @Field(() => GraphQLUpload, { nullable: true })
   @IsOptional()
-  image?: Promise<FileUpload>;
+  image?: any;
+}
+
+@InputType()
+export class UpdatePostInput {
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @Field(() => GraphQLUpload, { nullable: true })
+  @IsOptional()
+  image?: any;
 }

@@ -43,31 +43,12 @@ export class MessageResolver {
 
   @Subscription(() => MessageType, {
     filter: (payload, variables, context) => {
-
-      console.log(`the context is`);
-      console.log(context);
-
-      console.log("the payload");
-      console.log(payload);
-
-      if (payload.conversationId !== variables.conversationId) {
-        return false;
-      }
-
-  
-
-      const user = context.user;
-      if (!user || !user._id) {
-        console.log('Subscription rejected: No authenticated user');
-        return false;
-      }
+      if (payload.conversationId !== variables.conversationId) return false;
 
       return true;
     },
   })
-  messageAdded(
-    @Args('conversationId') conversationId: string,
-  ) {
+  messageAdded(@Args('conversationId') conversationId: string) {
     return this.pubSub.asyncIterator(`messageAdded.${conversationId}`);
   }
 }

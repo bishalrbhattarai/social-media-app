@@ -84,6 +84,11 @@ type DeletePostResponse {
   message: String!
 }
 
+type UpdatePostResponse {
+  message: String!
+  post: PostType!
+}
+
 type FriendshipType {
   id: ID!
   requester: ID!
@@ -196,6 +201,7 @@ type Mutation {
   login(input: LoginUserInput!): LoginResponse!
   createPost(input: CreatePostInput!): CreatePostResponse!
   deletePost(id: String!): DeletePostResponse!
+  updatePost(postId: String!, input: UpdatePostInput!): UpdatePostResponse!
   likePost(postId: String!): String!
   unlikePost(postId: String!): String!
   sendFriendRequest(recipient: String!): String!
@@ -226,6 +232,11 @@ input CreatePostInput {
 
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
+
+input UpdatePostInput {
+  description: String
+  image: Upload
+}
 
 """Action to handle a friend request (accept or decline)"""
 enum FriendRequestAction {

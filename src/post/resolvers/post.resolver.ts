@@ -1,6 +1,6 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CreatePostResponse } from '../response/create-post.response';
-import { CreatePostInput } from '../dtos/post.dto';
+import { CreatePostInput, UpdatePostInput } from '../dtos/post.dto';
 import { PostService } from '../services/post.service';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/common/guards/auth.guard';
@@ -9,6 +9,7 @@ import { User } from 'src/auth/resolvers/auth.resolver';
 import { PostConnection } from '../entities/post.entity';
 import { PaginationInput } from '../dtos/pagination.dto';
 import { DeletePostResponse } from '../response/delete-post.response';
+import { UpdatePostResponse } from '../response/update-post.response';
 
 @Resolver()
 @UseGuards(AuthGuard)
@@ -45,4 +46,16 @@ export class PostResolver {
   async deletePost(@Args('id') id: string): Promise<DeletePostResponse> {
     return this.postService.deletePost(id);
   }
+
+
+@Mutation(() => UpdatePostResponse)
+async updatePost(
+  @Args('postId') postId: string,
+  @Args('input') input: UpdatePostInput,
+  @CurrentUser() user: User,
+): Promise<UpdatePostResponse> { 
+  return this.postService.updatePost(postId, input, user);
+}
+
+
 }
