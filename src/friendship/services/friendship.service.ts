@@ -74,8 +74,10 @@ export class FriendshipService {
     await this.friendshipRepository.create({
       requester: user._id,
       requesterName: requester.name,
+      requesterAvatar: requester?.avatar,
       recipient: recipientId,
       recipientName: recipient.name,
+      recipientAvatar: recipient?.avatar,
       status: FriendshipStatus.Pending,
     });
 
@@ -245,13 +247,69 @@ export class FriendshipService {
     };
   }
 
+
+  async getFriendRequestsConnection(
+    user: User,
+    first = 10,
+    after?: string,
+  ): Promise<FriendshipConnection> {
+    const userId = user._id;
+
+    const baseQuery = {
+      recipient: userId,
+      status: FriendshipStatus.Pending,
+    };
+
+    const cursorFilter = after
+      ? { _id: { $gt: new Types.ObjectId(after) } }
+      : {};
+
+    const query = {
+      ...baseQuery,
+      ...cursorFilter,
+    };
+
+    const limit = first + 1;
+
+    const friendships = await this.friendshipRepository.find(query, {
+      first: limit,
+      sort: { _id: 1 },
+    });
+
+    const hasNextPage = friendships.length > first;
+
+    const slicedFriendships = friendships.slice(0, first);
+
+    const edges: FriendshipEdge[] = slicedFriendships.map((friendship) => ({
+      node: this.mapToFriendshipType(friendship),
+      cursor: String(friendship._id),
+    }));
+
+    const endCursor = edges.length > 0 ? edges[edges.length - 1].cursor : null;
+
+    const pageInfo: PageInfo = {
+      endCursor,
+      hasNextPage,
+    };
+
+    return {
+      edges,
+      pageInfo,
+    };
+  }
+
+
+
+
   private mapToFriendshipType(friendship: FriendshipDocument): FriendshipType {
     return {
       id: String(friendship._id),
       requester: friendship.requester.toString(),
       requesterName: friendship.requesterName,
+      requesterAvatar: friendship.requesterAvatar || '',
       recipient: friendship.recipient.toString(),
       recipientName: friendship.recipientName,
+      recipientAvatar: friendship.recipientAvatar || '',
       status: friendship.status,
       createdAt: friendship.createdAt,
       updatedAt: friendship.updatedAt,

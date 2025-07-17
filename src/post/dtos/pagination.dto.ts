@@ -3,11 +3,18 @@ import { IsOptional } from 'class-validator';
 
 @InputType()
 export class PaginationInput {
-  @Field(() => Number, { defaultValue: 5 })
+  @Field(() => Number, { nullable:true, defaultValue: 5 })
   @IsOptional()
-  first: number;
+  first?: number;
 
   @Field(() => String, { nullable: true })
 @IsOptional()
   after?: string;
+
+
+
+  @Field({ nullable: true }) 
+  @IsOptional()
+  search?: string;
+
 }

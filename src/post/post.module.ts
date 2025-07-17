@@ -7,11 +7,12 @@ import { PostService } from './services/post.service';
 import { UserModule } from 'src/user/user.module';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 import { LikeModule } from 'src/like/like.module';
+import { JobModule } from 'src/job/job.module';
 
 @Module({
   imports: [
     DatabaseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
-
+     forwardRef(()=>JobModule) ,
     CloudinaryModule,
     forwardRef(() => LikeModule),
     UserModule,

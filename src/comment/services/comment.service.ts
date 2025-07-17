@@ -19,6 +19,12 @@ export class CommentService {
     private readonly postService: PostService,
   ) {}
 
+  async deleteMany(postId: string) {
+    await this.commentRepository.deleteMany({
+      postId: new mongoose.Types.ObjectId(postId),
+    });
+  }
+
   async createComment(
     postId: string,
     user: User,

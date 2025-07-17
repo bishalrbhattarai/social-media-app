@@ -29,6 +29,13 @@ export class FriendshipType {
   @Field()
   recipientName: string;
 
+  @Field({ nullable: true })
+  requesterAvatar?: string;
+
+  @Field({ nullable: true })
+  recipientAvatar?: string;
+
+
   @Field(() => FriendshipStatus)
   status: FriendshipStatus;
 

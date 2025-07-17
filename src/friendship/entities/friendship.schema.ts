@@ -1,7 +1,6 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
 
-
 export enum FriendshipStatus {
   Pending = 'pending',
   Accepted = 'accepted',
@@ -12,16 +11,22 @@ export enum FriendshipStatus {
 @Schema({ timestamps: true })
 export class Friendship {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true })
-  requester: string; 
+  requester: string;
 
   @Prop({ required: true })
-  requesterName: string; 
+  requesterName: string;
+
+  @Prop({required:false,default:""})
+  requesterAvatar?: string;
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true })
-  recipient: string; 
+  recipient: string;
 
   @Prop({ required: true })
-  recipientName: string; 
+  recipientName: string;
+
+  @Prop({required:false,default:""})
+  recipientAvatar?: string;
 
   @Prop({
     type: String,
@@ -31,10 +36,11 @@ export class Friendship {
   status: FriendshipStatus;
 }
 export const FriendshipSchema = SchemaFactory.createForClass(Friendship);
-export type FriendshipDocument = Friendship & Document & {
-  createdAt: Date;
-  updatedAt: Date;
-};
+export type FriendshipDocument = Friendship &
+  Document & {
+    createdAt: Date;
+    updatedAt: Date;
+  };
 
 FriendshipSchema.index({ requester: 1 });
 FriendshipSchema.index({ recipient: 1 });

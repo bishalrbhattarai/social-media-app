@@ -16,6 +16,7 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { PostDocument } from '../entities/post.schema';
 import { LikeService } from 'src/like/services/like.service';
 import { UpdatePostResponse } from '../response/update-post.response';
+import { DeletePostJobService } from 'src/job/delete-post.service';
 
 @Injectable()
 export class PostService {
@@ -24,6 +25,7 @@ export class PostService {
     private readonly userService: UserService,
     private readonly cloudinaryService: CloudinaryService,
     private readonly likeService: LikeService,
+    private readonly deletePostJobService: DeletePostJobService,
   ) {}
 
   async findByIdAndUpdate(postId: string, update: UpdateQuery<PostDocument>) {
@@ -37,31 +39,37 @@ export class PostService {
     input: PaginationInput,
     user: User,
   ): Promise<PostConnection> {
-    const { first = 5, after } = input;
+    const { first = 5, after, search } = input;
 
-    const posts = await this.postRepository.find(
-      {},
-      { first: first + 1, after },
-    );
+    const filter: any = {};
+    if (search) {
+      filter.description = { $regex: search, $options: 'i' };
+    }
+
+    if (after) {
+      filter._id = { $lt: after };
+    }
+
+    const posts = await this.postRepository.find(filter, {
+      first: first + 1,
+      after,
+    });
+
     const hasNextPage = posts.length > first;
-
     const slicedPosts = hasNextPage ? posts.slice(0, first) : posts;
 
     console.log('yaha samma ayo code:');
 
     const postIds = slicedPosts.map((p) => String(p._id));
-
     const likedDocs = await this.likeService.findLikesByUserForPosts(
       user._id,
       postIds,
     );
-
     const likedPostIds = new Set(
       likedDocs.map((like) => like.postId.toString()),
     );
 
-    console.log(likedPostIds);
-
+    // Build edges
     const edges: PostEdge[] = slicedPosts.map((post) => ({
       node: {
         ...toPostType(post),
@@ -133,7 +141,8 @@ export class PostService {
 
     if (!deletedPost)
       throw new NotFoundException('Post not found or already deleted');
-
+    
+    this.deletePostJobService.addJob(id)
     return {
       message: 'Post deleted successfully',
     };

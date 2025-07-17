@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CommentResolver } from './resolvers/comment.resolver';
 import { CommentService } from './services/comment.service';
 import { DatabaseModule } from 'src/database/database.module';
@@ -12,11 +12,11 @@ import { PostModule } from 'src/post/post.module';
 @Module({
   imports: [
     PostModule,
-    JobModule,
+    forwardRef(() => JobModule),
     UserModule,
     DatabaseModule.forFeature([{ name: Comment.name, schema: CommentSchema }]),
   ],
   providers: [CommentResolver, CommentService, CommentRepository],
-  exports: [],
+  exports: [CommentService],
 })
 export class CommentModule {}

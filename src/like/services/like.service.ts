@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, forwardRef, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  forwardRef,
+  Inject,
+} from '@nestjs/common';
 import { LikeRepository } from '../repositories/like.repository';
 import { User } from 'src/auth/resolvers/auth.resolver';
 import { Types } from 'mongoose';
@@ -12,6 +17,11 @@ export class LikeService {
     private readonly postService: PostService,
   ) {}
 
+  async deleteMany(postId: string) {
+    await this.likeRepository.deleteMany({
+      postId: new Types.ObjectId(postId),
+    });
+  }
 
   async findLikesByUserForPosts(userId: string, postIds: string[]) {
     return this.likeRepository.find(
@@ -19,10 +29,9 @@ export class LikeService {
         userId,
         postId: { $in: postIds },
       },
-      { first: postIds.length }, 
+      { first: postIds.length },
     );
   }
-
 
   async likePost(user: User, postId: string): Promise<string> {
     const existingLike = await this.likeRepository.findOne({

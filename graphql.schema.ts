@@ -26,8 +26,9 @@ export enum FriendRequestAction {
 }
 
 export interface PaginationInput {
-    first: number;
+    first?: Nullable<number>;
     after?: Nullable<string>;
+    search?: Nullable<string>;
 }
 
 export interface CreateUserInput {
@@ -149,6 +150,8 @@ export interface FriendshipType {
     requesterName: string;
     recipient: string;
     recipientName: string;
+    requesterAvatar?: Nullable<string>;
+    recipientAvatar?: Nullable<string>;
     status: FriendshipStatus;
     createdAt: DateTime;
     updatedAt: DateTime;
@@ -225,6 +228,7 @@ export interface IQuery {
     posts(input?: Nullable<PaginationInput>): PostConnection | Promise<PostConnection>;
     myPosts(input?: Nullable<PaginationInput>): PostConnection | Promise<PostConnection>;
     myFriends(first?: Nullable<number>, after?: Nullable<string>): FriendshipConnection | Promise<FriendshipConnection>;
+    myFriendRequests(first?: Nullable<number>, after?: Nullable<string>): FriendshipConnection | Promise<FriendshipConnection>;
     getMessages(conversationId: string, first?: Nullable<number>, after?: Nullable<string>): MessageConnection | Promise<MessageConnection>;
 }
 
@@ -240,11 +244,11 @@ export interface IMutation {
     updatePost(postId: string, input: UpdatePostInput): UpdatePostResponse | Promise<UpdatePostResponse>;
     likePost(postId: string): string | Promise<string>;
     unlikePost(postId: string): string | Promise<string>;
+    createComment(input: CreateCommentInput): string | Promise<string>;
+    deleteComment(input: DeleteCommentInput): string | Promise<string>;
     sendFriendRequest(recipient: string): string | Promise<string>;
     handleFriendRequest(requesterId: string, action: FriendRequestAction): string | Promise<string>;
     removeFriend(friendId: string): string | Promise<string>;
-    createComment(input: CreateCommentInput): string | Promise<string>;
-    deleteComment(input: DeleteCommentInput): string | Promise<string>;
     createMessage(conversationId: string, content: string): MessageType | Promise<MessageType>;
     createConversation(receiverId: string): ConversationType | Promise<ConversationType>;
     triggerCommentNotification(userId: string, message: string): string | Promise<string>;

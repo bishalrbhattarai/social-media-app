@@ -55,7 +55,7 @@ import { CommonModule } from 'src/common/common.module';
                     'Token is missing from the authorization header',
                   );
 
-                let payload:any;
+                let payload: any;
                 try {
                   payload = tokenService.verifyAccessToken(token);
                 } catch (error) {
@@ -108,18 +108,11 @@ import { CommonModule } from 'src/common/common.module';
         },
 
         context: ({ req, res, connection }) => {
-
-          console.log("context ko ho");
-          console.log(connection);
-
-
           if (req) {
             return { req, res } as GqlContext;
           }
 
-        
           if (connection) {
-          
             return {
               ...connection.context,
             };

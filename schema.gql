@@ -95,6 +95,8 @@ type FriendshipType {
   requesterName: String!
   recipient: ID!
   recipientName: String!
+  requesterAvatar: String
+  recipientAvatar: String
   status: FriendshipStatus!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -184,12 +186,14 @@ type Query {
   posts(input: PaginationInput = {first: 5}): PostConnection!
   myPosts(input: PaginationInput = {first: 5}): PostConnection!
   myFriends(first: Int, after: String): FriendshipConnection!
+  myFriendRequests(first: Int, after: String): FriendshipConnection!
   getMessages(conversationId: String!, first: Float = 10, after: String): MessageConnection!
 }
 
 input PaginationInput {
-  first: Float! = 5
+  first: Float = 5
   after: String
+  search: String
 }
 
 type Mutation {
@@ -204,11 +208,11 @@ type Mutation {
   updatePost(postId: String!, input: UpdatePostInput!): UpdatePostResponse!
   likePost(postId: String!): String!
   unlikePost(postId: String!): String!
+  createComment(input: CreateCommentInput!): String!
+  deleteComment(input: DeleteCommentInput!): String!
   sendFriendRequest(recipient: String!): String!
   handleFriendRequest(requesterId: String!, action: FriendRequestAction!): String!
   removeFriend(friendId: String!): String!
-  createComment(input: CreateCommentInput!): String!
-  deleteComment(input: DeleteCommentInput!): String!
   createMessage(conversationId: String!, content: String!): MessageType!
   createConversation(receiverId: String!): ConversationType!
   triggerCommentNotification(userId: String!, message: String!): String!
@@ -238,12 +242,6 @@ input UpdatePostInput {
   image: Upload
 }
 
-"""Action to handle a friend request (accept or decline)"""
-enum FriendRequestAction {
-  ACCEPT
-  DECLINE
-}
-
 input CreateCommentInput {
   postId: String!
   content: String!
@@ -253,6 +251,12 @@ input CreateCommentInput {
 input DeleteCommentInput {
   postId: String!
   commentId: String!
+}
+
+"""Action to handle a friend request (accept or decline)"""
+enum FriendRequestAction {
+  ACCEPT
+  DECLINE
 }
 
 type Subscription {

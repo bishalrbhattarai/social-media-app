@@ -61,4 +61,16 @@ export class FriendshipResolver {
   ) {
     return this.friendshipService.getFriendsConnection(user, first, after);
   }
+
+  @Query(() => FriendshipConnection)
+  async myFriendRequests(
+    @CurrentUser() user: User,
+    @Args('first', { type: () => Int, nullable: true }) first?: number,
+    @Args('after', { nullable: true }) after?: string,
+  ) {
+    return this.friendshipService.getFriendRequestsConnection(user, first, after);
+  }
+
+
+
 }
