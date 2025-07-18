@@ -27,6 +27,10 @@ export class RecentMessageType {
   content: string;
 
   @Field()
+  messageId: string;
+
+
+  @Field()
   createdAt: Date;
 }
 

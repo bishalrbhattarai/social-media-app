@@ -110,11 +110,8 @@ interface CustomExtra extends Record<string, any> {
         },
 
         context: ({ req, res,  extra }) => {
-          console.log("yo chai context wala block");
-          console.log(extra?.user);
 
           if (req) {
-            console.log("yo req wala block");
             return { req, res } as GqlContext;
           }
 

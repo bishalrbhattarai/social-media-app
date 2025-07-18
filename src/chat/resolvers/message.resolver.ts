@@ -7,6 +7,7 @@ import { MessageService } from '../services/message.service';
 import { MessageConnection, MessageType } from '../entities/message.entity';
 import { PUB_SUB } from 'src/pubsub/pubsub.provider';
 import { RedisPubSub } from 'graphql-redis-subscriptions';
+import { DeleteMessageInput } from '../dtos/delete-message.dto';
 
 @Resolver()
 export class MessageResolver {
@@ -23,6 +24,15 @@ export class MessageResolver {
     @CurrentUser() user: User,
   ): Promise<MessageType> {
     return this.messageService.createMessage(user, conversationId, content);
+  }
+
+  @Mutation(() => String)
+  @UseGuards(AuthGuard)
+  async deleteMessage(
+    @Args('input') input: DeleteMessageInput,
+    @CurrentUser() user: User,
+  ): Promise<string> {
+    return this.messageService.deleteMessage(user, input);
   }
 
   @Query(() => MessageConnection)
@@ -50,5 +60,16 @@ export class MessageResolver {
   })
   messageAdded(@Args('conversationId') conversationId: string) {
     return this.pubSub.asyncIterator(`messageAdded.${conversationId}`);
+  }
+
+  @Subscription(() => MessageType, {
+    filter: (payload, variables, context) => {
+      if (!context.extra.user) return false;
+      if (payload.conversationId !== variables.conversationId) return false;
+      return true;
+    },
+  })
+  messageDeleted(@Args('conversationId') conversationId: string) {
+    return this.pubSub.asyncIterator(`messageDeleted.${conversationId}`);
   }
 }

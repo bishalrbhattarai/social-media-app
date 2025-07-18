@@ -16,6 +16,7 @@ import {
 } from '../entities/message.entity';
 import { PUB_SUB } from 'src/pubsub/pubsub.provider';
 import { RedisPubSub } from 'graphql-redis-subscriptions';
+import { DeleteMessageInput } from '../dtos/delete-message.dto';
 
 @Injectable()
 export class MessageService {
@@ -25,6 +26,85 @@ export class MessageService {
     private readonly userService: UserService,
     @Inject(PUB_SUB) private readonly pubSub: RedisPubSub,
   ) {}
+
+  async deleteMessage(user: User, input: DeleteMessageInput): Promise<string> {
+    const { messageId, conversationId } = input;
+
+    const conversation = await this.conversationRepository.findOne({
+      _id: new Types.ObjectId(conversationId),
+      'participants.userId': user._id,
+    });
+
+    if (!conversation) {
+      throw new NotFoundException('Conversation not found or access denied');
+    }
+
+    const message = await this.messageRepository.findOne({
+      _id: new Types.ObjectId(messageId),
+      conversationId: conversationId,
+      senderId: user._id,
+    });
+
+    if (!message) {
+      throw new NotFoundException('You can only delete your own messages');
+    }
+
+    // Delete the message itself
+    await this.messageRepository.delete({ _id: message._id });
+/*
+    const messageResult = {
+      id: String(message._id),
+      conversationId: message.conversationId.toString(),
+      senderId: message.senderId.toString(),
+      senderName: message.senderName,
+      senderAvatar: message.senderAvatar,
+      content: message.content,
+      read: message.read,
+      createdAt: message.createdAt,
+      updatedAt: message.updatedAt,
+    };
+
+    await this.pubSub.publish(`messageDeleted.${conversationId}`, {
+      messageAdded: messageResult,
+      conversationId,
+    });
+
+
+
+*/
+
+
+
+
+    // Pull the message from recentMessages array
+    await this.conversationRepository.updateOne(
+      { _id: conversation._id },
+      {
+        $pull: { recentMessages: { messageId: message._id } },
+      },
+    );
+
+
+    const messageResult = {
+      id: String(message._id),
+      conversationId: message.conversationId.toString(),
+      senderId: message.senderId.toString(),
+      senderName: message.senderName,
+      senderAvatar: message.senderAvatar,
+      content: message.content,
+      read: message.read,
+      createdAt: message.createdAt,
+      updatedAt: message.updatedAt,
+    };
+
+    await this.pubSub.publish(`messageDeleted.${conversationId}`, {
+      messageAdded: messageResult,
+      conversationId,
+    });
+
+
+    return `Message with ID ${messageId} deleted successfully`;
+  }
 
   async createMessage(
     user: User,
@@ -60,6 +140,7 @@ export class MessageService {
         senderId: user._id.toString(),
         senderName: currentUser.name,
         senderAvatar: currentUser.avatar,
+        messageId: String(createdMessage._id),
         content,
         createdAt: new Date(),
       },
@@ -85,13 +166,12 @@ export class MessageService {
       updatedAt: createdMessage.updatedAt,
     };
 
-
     await this.pubSub.publish(`messageAdded.${conversationId}`, {
       messageAdded: messageResult,
       conversationId,
     });
 
-    return messageResult;
+    return messageResult as MessageType;
   }
 
   async getMessagesConnection(

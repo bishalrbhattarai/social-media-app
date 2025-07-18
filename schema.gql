@@ -141,6 +141,7 @@ type RecentMessageType {
   senderName: String!
   senderAvatar: String
   content: String!
+  messageId: String!
   createdAt: DateTime!
 }
 
@@ -214,6 +215,7 @@ type Mutation {
   handleFriendRequest(requesterId: String!, action: FriendRequestAction!): String!
   removeFriend(friendId: String!): String!
   createMessage(conversationId: String!, content: String!): MessageType!
+  deleteMessage(input: DeleteMessageInput!): String!
   createConversation(receiverId: String!): ConversationType!
   triggerCommentNotification(userId: String!, message: String!): String!
 }
@@ -259,7 +261,13 @@ enum FriendRequestAction {
   DECLINE
 }
 
+input DeleteMessageInput {
+  messageId: String!
+  conversationId: String!
+}
+
 type Subscription {
   messageAdded(conversationId: String!): MessageType!
+  messageDeleted(conversationId: String!): MessageType!
   commentAdded(userId: String!): String!
 }

@@ -4,7 +4,7 @@ import { Document } from 'mongoose';
 @Schema({ timestamps: true })
 export class ConversationParticipant {
   @Prop({ required: true })
-  userId: string; 
+  userId: string;
 
   @Prop({ required: true })
   name: string;
@@ -13,7 +13,9 @@ export class ConversationParticipant {
   avatar?: string;
 }
 
-export const ConversationParticipantSchema = SchemaFactory.createForClass(ConversationParticipant);
+export const ConversationParticipantSchema = SchemaFactory.createForClass(
+  ConversationParticipant,
+);
 
 @Schema()
 export class RecentMessage {
@@ -25,6 +27,9 @@ export class RecentMessage {
 
   @Prop()
   senderAvatar?: string;
+
+  @Prop()
+  messageId: string;
 
   @Prop({ required: true })
   content: string;

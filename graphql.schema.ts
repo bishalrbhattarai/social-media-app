@@ -63,6 +63,11 @@ export interface DeleteCommentInput {
     commentId: string;
 }
 
+export interface DeleteMessageInput {
+    messageId: string;
+    conversationId: string;
+}
+
 export interface UserType {
     id: string;
     name: string;
@@ -183,6 +188,7 @@ export interface RecentMessageType {
     senderName: string;
     senderAvatar?: Nullable<string>;
     content: string;
+    messageId: string;
     createdAt: DateTime;
 }
 
@@ -250,12 +256,14 @@ export interface IMutation {
     handleFriendRequest(requesterId: string, action: FriendRequestAction): string | Promise<string>;
     removeFriend(friendId: string): string | Promise<string>;
     createMessage(conversationId: string, content: string): MessageType | Promise<MessageType>;
+    deleteMessage(input: DeleteMessageInput): string | Promise<string>;
     createConversation(receiverId: string): ConversationType | Promise<ConversationType>;
     triggerCommentNotification(userId: string, message: string): string | Promise<string>;
 }
 
 export interface ISubscription {
     messageAdded(conversationId: string): MessageType | Promise<MessageType>;
+    messageDeleted(conversationId: string): MessageType | Promise<MessageType>;
     commentAdded(userId: string): string | Promise<string>;
 }
 
