@@ -8,6 +8,11 @@ import { TokenService } from 'src/common/services/token.service';
 import { CacheService } from 'src/common/services/cache.service';
 import { CommonModule } from 'src/common/common.module';
 
+interface CustomExtra extends Record<string, any> {
+  user?: any;
+  isAuthenticated?: boolean;
+}
+
 @Module({
   imports: [
     CommonModule,
@@ -30,7 +35,8 @@ import { CommonModule } from 'src/common/common.module';
         subscriptions: {
           'graphql-ws': {
             onConnect: async (context) => {
-              const { connectionParams } = context;
+              const { connectionParams, extra } = context;
+              const customExtra = extra as CustomExtra;
               console.log('graphql-ws connection attempt:', connectionParams);
 
               try {
@@ -63,13 +69,11 @@ import { CommonModule } from 'src/common/common.module';
                   throw new UnauthorizedException('Invalid or expired token');
                 }
 
-                if (!payload) {
+                if (!payload)
                   throw new UnauthorizedException('Invalid token payload');
-                }
 
-                if (!payload.isEmailVerified) {
+                if (!payload.isEmailVerified)
                   throw new UnauthorizedException('Email is not verified');
-                }
 
                 // const cacheValue = await cacheService.get<string>(
                 //   `access-token:${payload.jti}`,
@@ -83,17 +87,15 @@ import { CommonModule } from 'src/common/common.module';
                 //   throw new Error('Unauthorized User - Token mismatch');
                 // }
 
-                const user = { ...payload, _id: payload.sub };
+                const user = { email:payload.email, _id: payload.sub,isEmailVerfied: payload.isEmailVerified };
 
-                console.log('graphql-ws authenticated successfully:', {
-                  userId: user._id,
-                  email: user.email,
-                });
+                // console.log('graphql-ws authenticated successfully:', {
+                //   userId: user._id,
+                //   email: user.email,
+                // });
 
-                return {
-                  user,
-                  isAuthenticated: true,
-                };
+                customExtra.user = user;
+
               } catch (error) {
                 console.error(
                   'graphql-ws authentication failed:',
@@ -107,16 +109,21 @@ import { CommonModule } from 'src/common/common.module';
           },
         },
 
-        context: ({ req, res, connection }) => {
+        context: ({ req, res,  extra }) => {
+          console.log("yo chai context wala block");
+          console.log(extra?.user);
+
           if (req) {
+            console.log("yo req wala block");
             return { req, res } as GqlContext;
           }
 
-          if (connection) {
-            return {
-              ...connection.context,
-            };
+          return {
+            extra: {
+              user: extra.user,
+            } as CustomExtra,
           }
+    
         },
         csrfPrevention: false,
       }),

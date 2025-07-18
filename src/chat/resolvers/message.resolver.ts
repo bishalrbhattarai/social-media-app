@@ -43,8 +43,8 @@ export class MessageResolver {
 
   @Subscription(() => MessageType, {
     filter: (payload, variables, context) => {
+      if (!context.extra.user) return false;
       if (payload.conversationId !== variables.conversationId) return false;
-
       return true;
     },
   })
