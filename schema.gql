@@ -49,6 +49,10 @@ type ForgotPasswordResponse {
   message: String!
 }
 
+type VerifyResetPasswordTokenResponse {
+  message: String!
+}
+
 type RecentCommentType {
   content: String!
   authorId: String!
@@ -206,6 +210,7 @@ input PaginationInput {
 }
 
 type Mutation {
+  verifyResetPasswordToken(newPassword: String!): VerifyResetPasswordTokenResponse!
   forgotPassword(email: String!): ForgotPasswordResponse!
   generateEmailVerificationToken(email: String!): EmailVerificationResponse!
   changePassword(input: ChangePasswordInput!): ChangePasswordResponse!

@@ -114,6 +114,10 @@ export interface ForgotPasswordResponse {
     message: string;
 }
 
+export interface VerifyResetPasswordTokenResponse {
+    message: string;
+}
+
 export interface RecentCommentType {
     content: string;
     authorId: string;
@@ -252,6 +256,7 @@ export interface IQuery {
 }
 
 export interface IMutation {
+    verifyResetPasswordToken(newPassword: string): VerifyResetPasswordTokenResponse | Promise<VerifyResetPasswordTokenResponse>;
     forgotPassword(email: string): ForgotPasswordResponse | Promise<ForgotPasswordResponse>;
     generateEmailVerificationToken(email: string): EmailVerificationResponse | Promise<EmailVerificationResponse>;
     changePassword(input: ChangePasswordInput): ChangePasswordResponse | Promise<ChangePasswordResponse>;

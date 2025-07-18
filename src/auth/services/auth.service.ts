@@ -23,6 +23,7 @@ import { UserType } from 'src/user/entities/user.entity';
 import { ChangePasswordResponse } from '../response/change-password-response';
 import { ForgotPasswordService } from 'src/job/forgot-password.service';
 import { ForgotPasswordResponse } from '../response/forgot-password-response';
+import { VerifyResetPasswordTokenResponse } from '../response/verify-reset-password-token-response';
 
 @Injectable()
 export class AuthService {
@@ -35,18 +36,22 @@ export class AuthService {
     private readonly forgortPasswordService: ForgotPasswordService,
   ) {}
 
-  
-    async verifyResetPasswordToken(req:Request,newPassword:string) {
+  async verifyResetPasswordToken(req: Request, newPassword: string) :Promise<VerifyResetPasswordTokenResponse>{
     const token = req.headers['reset-password-token'];
     if (!token) throw new BadRequestException('Token is missing');
     const _id = await this.cacheService.get<string>(`forgot-password:${token}`);
     if (!_id) throw new BadRequestException('Invalid reset-password-token');
 
-        
-
-    }
-
-
+    const foundUser = await this.userService.findOneById(_id);
+    if (!foundUser) throw new NotFoundException('User not found');
+    const hashedPassword = await this.passwordService.hashPassword(newPassword);
+    foundUser.password = hashedPassword;
+    await foundUser.save();
+    await this.cacheService.del(`forgot-password:${token}`);
+    return {
+      message: 'Password reset successfully please login',
+    };
+  }
 
   async sendForgotPasswordEmail(
     email: string,
@@ -67,7 +72,8 @@ export class AuthService {
     this.forgortPasswordService.sendResetPasswordEmail(email, token);
 
     return {
-      message:'Forgot password email sent successfully. Please check your email.',
+      message:
+        'Forgot password email sent successfully. Please check your email.',
     };
   }
 

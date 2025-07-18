@@ -17,6 +17,7 @@ import { EmailVerificationResponse } from '../response/email-verification-respon
 import { UserType } from 'src/user/entities/user.entity';
 import { ChangePasswordResponse } from '../response/change-password-response';
 import { ForgotPasswordResponse } from '../response/forgot-password-response';
+import { VerifyResetPasswordTokenResponse } from '../response/verify-reset-password-token-response';
 
 export interface User {
   _id: string;
@@ -32,10 +33,11 @@ export interface GqlContext {
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
+  @Mutation(()=>VerifyResetPasswordTokenResponse)
   verifyResetPasswordToken(
     @Context() { req }: GqlContext,
     @Args('newPassword') newPassword: string,
-  ) {
+  ):Promise<VerifyResetPasswordTokenResponse> {
     return this.authService.verifyResetPasswordToken(req, newPassword);
   }
 
