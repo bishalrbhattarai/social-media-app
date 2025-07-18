@@ -32,3 +32,16 @@ export class LoginUserInput {
   @IsNotEmpty()
   password: string;
 }
+
+@InputType()
+export class ChangePasswordInput {
+  @Field()
+  @IsString()
+  @IsNotEmpty()
+  currentPassword: string;
+
+  @Field()
+  @IsString()
+  @IsNotEmpty()
+  newPassword: string;
+}

@@ -1,5 +1,9 @@
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { CreateUserInput, LoginUserInput } from '../dtos/auth.dto';
+import {
+  ChangePasswordInput,
+  CreateUserInput,
+  LoginUserInput,
+} from '../dtos/auth.dto';
 import { AuthService } from '../services/auth.service';
 import { RegisterResponse } from '../response/register-response';
 import { LoginResponse } from '../response/login-response';
@@ -10,6 +14,9 @@ import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { EmailVerificationResponse } from '../response/email-verification-response';
+import { UserType } from 'src/user/entities/user.entity';
+import { ChangePasswordResponse } from '../response/change-password-response';
+import { ForgotPasswordResponse } from '../response/forgot-password-response';
 
 export interface User {
   _id: string;
@@ -25,12 +32,24 @@ export interface GqlContext {
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
-  @Query(() => String)
+  verifyResetPasswordToken(
+    @Context() { req }: GqlContext,
+    @Args('newPassword') newPassword: string,
+  ) {
+    return this.authService.verifyResetPasswordToken(req, newPassword);
+  }
+
+  @Query(() => UserType)
   @UseGuards(AuthGuard)
-  me(@CurrentUser() user: User): string {
-    console.log(`From User Custom Decorator current User and the value is`);
-    console.log(user);
-    return 'Hello World from me query';
+  myProfile(@CurrentUser() user: User): Promise<UserType> {
+    return this.authService.myProfile(user);
+  }
+
+  @Mutation(() => ForgotPasswordResponse)
+  forgotPassword(
+    @Args('email') email: string,
+  ): Promise<ForgotPasswordResponse> {
+    return this.authService.sendForgotPasswordEmail(email);
   }
 
   @Mutation(() => EmailVerificationResponse)
@@ -38,6 +57,19 @@ export class AuthResolver {
     @Args('email') email: string,
   ): Promise<EmailVerificationResponse> {
     return this.authService.generateEmailVerificationToken(email);
+  }
+
+  @Mutation(() => ChangePasswordResponse)
+  @UseGuards(AuthGuard)
+  changePassword(
+    @Args('input') input: ChangePasswordInput,
+    @CurrentUser() user: User,
+  ): Promise<ChangePasswordResponse> {
+    return this.authService.changePassword(
+      user,
+      input.currentPassword,
+      input.newPassword,
+    );
   }
 
   @Mutation(() => EmailVerificationResponse)

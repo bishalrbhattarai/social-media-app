@@ -10,6 +10,8 @@ import { DeletePostJobService } from './delete-post.service';
 import { LikeModule } from 'src/like/like.module';
 import { CommentModule } from 'src/comment/comment.module';
 import { DeletePostProcessor } from './delete-post.processor';
+import { ForgotPasswordService } from './forgot-password.service';
+import { ForgotPasswordProcessor } from './forgot-password.processor';
 
 @Module({
   imports: [
@@ -31,6 +33,9 @@ import { DeletePostProcessor } from './delete-post.processor';
     BullModule.registerQueue({
       name: 'post',
     }),
+    BullModule.registerQueue({
+      name: 'forgot-password',
+    }),
     EmailModule,
   ],
   providers: [
@@ -39,12 +44,15 @@ import { DeletePostProcessor } from './delete-post.processor';
     UpdateCommentProcessor,
     UpdateCommentService,
     DeletePostJobService,
-    DeletePostProcessor
+    DeletePostProcessor,
+    ForgotPasswordService,
+    ForgotPasswordProcessor
   ],
   exports: [
     UpdateCommentService,
     EmailVerificationJobService,
     DeletePostJobService,
+    ForgotPasswordService,
   ],
 })
 export class JobModule implements OnModuleInit {

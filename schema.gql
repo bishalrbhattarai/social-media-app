@@ -41,6 +41,14 @@ type EmailVerificationResponse {
   message: String!
 }
 
+type ChangePasswordResponse {
+  message: String!
+}
+
+type ForgotPasswordResponse {
+  message: String!
+}
+
 type RecentCommentType {
   content: String!
   authorId: String!
@@ -183,7 +191,7 @@ type MessageConnection {
 
 type Query {
   check: String!
-  me: String!
+  myProfile: UserType!
   posts(input: PaginationInput = {first: 5}): PostConnection!
   myPosts(input: PaginationInput = {first: 5}): PostConnection!
   myFriends(first: Int, after: String): FriendshipConnection!
@@ -198,7 +206,9 @@ input PaginationInput {
 }
 
 type Mutation {
+  forgotPassword(email: String!): ForgotPasswordResponse!
   generateEmailVerificationToken(email: String!): EmailVerificationResponse!
+  changePassword(input: ChangePasswordInput!): ChangePasswordResponse!
   verifyEmailToken: EmailVerificationResponse!
   register(input: CreateUserInput!): RegisterResponse!
   refreshAccessToken: RefreshTokenResponse!
@@ -218,6 +228,11 @@ type Mutation {
   deleteMessage(input: DeleteMessageInput!): String!
   createConversation(receiverId: String!): ConversationType!
   triggerCommentNotification(userId: String!, message: String!): String!
+}
+
+input ChangePasswordInput {
+  currentPassword: String!
+  newPassword: String!
 }
 
 input CreateUserInput {

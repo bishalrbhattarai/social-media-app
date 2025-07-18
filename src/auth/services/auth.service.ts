@@ -18,16 +18,96 @@ import { EmailVerificationJobService } from 'src/job/email-verification.service'
 import { v4 as uuidv4 } from 'uuid';
 import { EmailVerificationResponse } from '../response/email-verification-response';
 import { User } from '../resolvers/auth.resolver';
+import { toUserType } from '../mappers/user.mapper';
+import { UserType } from 'src/user/entities/user.entity';
+import { ChangePasswordResponse } from '../response/change-password-response';
+import { ForgotPasswordService } from 'src/job/forgot-password.service';
+import { ForgotPasswordResponse } from '../response/forgot-password-response';
 
 @Injectable()
 export class AuthService {
   constructor(
-  private readonly userService: UserService,
+    private readonly userService: UserService,
     private readonly passwordService: PasswordService,
     private readonly tokenService: TokenService,
     private readonly cacheService: CacheService,
     private readonly emailVerificationJobService: EmailVerificationJobService,
+    private readonly forgortPasswordService: ForgotPasswordService,
   ) {}
+
+  
+    async verifyResetPasswordToken(req:Request,newPassword:string) {
+    const token = req.headers['reset-password-token'];
+    if (!token) throw new BadRequestException('Token is missing');
+    const _id = await this.cacheService.get<string>(`forgot-password:${token}`);
+    if (!_id) throw new BadRequestException('Invalid reset-password-token');
+
+        
+
+    }
+
+
+
+  async sendForgotPasswordEmail(
+    email: string,
+  ): Promise<ForgotPasswordResponse> {
+    const user = await this.userService.findOneByEmail(email);
+    if (!user) throw new NotFoundException('User not found');
+
+    // if (user.isEmailVerified === false)
+    //   throw new BadRequestException('Email is not verified');
+
+    const token = uuidv4();
+    await this.cacheService.set(
+      `forgot-password:${token}`,
+      user._id,
+      30 * 60 * 1000,
+    );
+
+    this.forgortPasswordService.sendResetPasswordEmail(email, token);
+
+    return {
+      message:'Forgot password email sent successfully. Please check your email.',
+    };
+  }
+
+  async changePassword(
+    user: User,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<ChangePasswordResponse> {
+    const foundUser = await this.userService.findOneByEmail(user.email);
+    if (!foundUser) throw new NotFoundException('User not found');
+
+    const isOldandNewSame = await this.passwordService.comparePassword(
+      newPassword,
+      foundUser.password,
+    );
+
+    if (isOldandNewSame)
+      throw new BadRequestException(
+        'New password cannot be the same as old password',
+      );
+
+    const isValid = await this.passwordService.comparePassword(
+      currentPassword,
+      foundUser.password,
+    );
+    if (!isValid) throw new BadRequestException('Invalid current password');
+
+    const hashedPassword = await this.passwordService.hashPassword(newPassword);
+    foundUser.password = hashedPassword;
+    await foundUser.save();
+    return {
+      message: 'Password changed successfully',
+    };
+  }
+
+  async myProfile(user: User): Promise<UserType> {
+    const currentUser = await this.userService.findOneById(user._id);
+    if (!currentUser) throw new NotFoundException('User not found');
+    return toUserType(currentUser);
+  }
 
   async verifyEmailToken(req: Request): Promise<EmailVerificationResponse> {
     const token = req.headers['email-verification-token'];

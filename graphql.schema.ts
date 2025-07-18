@@ -31,6 +31,11 @@ export interface PaginationInput {
     search?: Nullable<string>;
 }
 
+export interface ChangePasswordInput {
+    currentPassword: string;
+    newPassword: string;
+}
+
 export interface CreateUserInput {
     name: string;
     email: string;
@@ -98,6 +103,14 @@ export interface LogoutResponse {
 }
 
 export interface EmailVerificationResponse {
+    message: string;
+}
+
+export interface ChangePasswordResponse {
+    message: string;
+}
+
+export interface ForgotPasswordResponse {
     message: string;
 }
 
@@ -230,7 +243,7 @@ export interface MessageConnection {
 
 export interface IQuery {
     check(): string | Promise<string>;
-    me(): string | Promise<string>;
+    myProfile(): UserType | Promise<UserType>;
     posts(input?: Nullable<PaginationInput>): PostConnection | Promise<PostConnection>;
     myPosts(input?: Nullable<PaginationInput>): PostConnection | Promise<PostConnection>;
     myFriends(first?: Nullable<number>, after?: Nullable<string>): FriendshipConnection | Promise<FriendshipConnection>;
@@ -239,7 +252,9 @@ export interface IQuery {
 }
 
 export interface IMutation {
+    forgotPassword(email: string): ForgotPasswordResponse | Promise<ForgotPasswordResponse>;
     generateEmailVerificationToken(email: string): EmailVerificationResponse | Promise<EmailVerificationResponse>;
+    changePassword(input: ChangePasswordInput): ChangePasswordResponse | Promise<ChangePasswordResponse>;
     verifyEmailToken(): EmailVerificationResponse | Promise<EmailVerificationResponse>;
     register(input: CreateUserInput): RegisterResponse | Promise<RegisterResponse>;
     refreshAccessToken(): RefreshTokenResponse | Promise<RefreshTokenResponse>;
