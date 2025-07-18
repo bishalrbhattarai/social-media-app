@@ -49,34 +49,8 @@ export class MessageService {
       throw new NotFoundException('You can only delete your own messages');
     }
 
-    // Delete the message itself
     await this.messageRepository.delete({ _id: message._id });
-/*
-    const messageResult = {
-      id: String(message._id),
-      conversationId: message.conversationId.toString(),
-      senderId: message.senderId.toString(),
-      senderName: message.senderName,
-      senderAvatar: message.senderAvatar,
-      content: message.content,
-      read: message.read,
-      createdAt: message.createdAt,
-      updatedAt: message.updatedAt,
-    };
 
-    await this.pubSub.publish(`messageDeleted.${conversationId}`, {
-      messageAdded: messageResult,
-      conversationId,
-    });
-
-
-
-*/
-
-
-
-
-    // Pull the message from recentMessages array
     await this.conversationRepository.updateOne(
       { _id: conversation._id },
       {
@@ -84,7 +58,6 @@ export class MessageService {
       },
     );
 
-
     const messageResult = {
       id: String(message._id),
       conversationId: message.conversationId.toString(),
@@ -98,10 +71,9 @@ export class MessageService {
     };
 
     await this.pubSub.publish(`messageDeleted.${conversationId}`, {
-      messageAdded: messageResult,
+      messageDeleted: messageResult,
       conversationId,
     });
-
 
     return `Message with ID ${messageId} deleted successfully`;
   }
