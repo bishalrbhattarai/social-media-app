@@ -10,13 +10,13 @@ import mongoose, { UpdateQuery } from 'mongoose';
 import { UserService } from 'src/user/services/user.service';
 import { CreatePostResponse } from '../response/create-post.response';
 import { toPostType } from '../mappers/post.mapper';
-import { PostConnection, PostEdge, PostType } from '../entities/post.entity';
 import { PaginationInput } from '../dtos/pagination.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { PostDocument } from '../entities/post.schema';
 import { LikeService } from 'src/like/services/like.service';
 import { UpdatePostResponse } from '../response/update-post.response';
 import { DeletePostJobService } from 'src/job/delete-post.service';
+import { PostConnection } from '../entities/post.connection';
 
 @Injectable()
 export class PostService {
@@ -58,7 +58,6 @@ export class PostService {
     const hasNextPage = posts.length > first;
     const slicedPosts = hasNextPage ? posts.slice(0, first) : posts;
 
-    console.log('yaha samma ayo code:');
 
     const postIds = slicedPosts.map((p) => String(p._id));
     const likedDocs = await this.likeService.findLikesByUserForPosts(
@@ -69,8 +68,7 @@ export class PostService {
       likedDocs.map((like) => like.postId.toString()),
     );
 
-    // Build edges
-    const edges: PostEdge[] = slicedPosts.map((post) => ({
+    const edges = slicedPosts.map((post) => ({
       node: {
         ...toPostType(post),
         isLikedByMe: likedPostIds.has(String(post._id)),
@@ -115,7 +113,7 @@ export class PostService {
     );
     console.log(likedPostIds);
 
-    const edges: PostEdge[] = slicedPosts.map((post) => ({
+    const edges = slicedPosts.map((post) => ({
       node: {
         ...toPostType(post),
         isLikedByMe: likedPostIds.has(String(post._id)),

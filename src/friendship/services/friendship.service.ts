@@ -12,12 +12,8 @@ import {
 import { UserService } from 'src/user/services/user.service';
 import { FriendRequestAction } from '../resolvers/friendship.resolver';
 import { Types } from 'mongoose';
-import {
-  FriendshipConnection,
-  FriendshipEdge,
-  FriendshipType,
-  PageInfo,
-} from '../entities/friendship.entity';
+import { FriendshipType } from '../entities/friendship.entity';
+import { FriendshipConnection } from '../entities/friendship.connection';
 
 @Injectable()
 export class FriendshipService {
@@ -229,14 +225,14 @@ export class FriendshipService {
 
     const slicedFriendships = friendships.slice(0, first);
 
-    const edges: FriendshipEdge[] = slicedFriendships.map((friendship) => ({
+    const edges = slicedFriendships.map((friendship) => ({
       node: this.mapToFriendshipType(friendship),
       cursor: String(friendship._id),
     }));
 
     const endCursor = edges.length > 0 ? edges[edges.length - 1].cursor : null;
 
-    const pageInfo: PageInfo = {
+    const pageInfo = {
       endCursor,
       hasNextPage,
     };
@@ -247,8 +243,7 @@ export class FriendshipService {
     };
   }
 
-
-  async getFriendRequestsConnection(
+  async getFriendRequests(
     user: User,
     first = 10,
     after?: string,
@@ -280,14 +275,14 @@ export class FriendshipService {
 
     const slicedFriendships = friendships.slice(0, first);
 
-    const edges: FriendshipEdge[] = slicedFriendships.map((friendship) => ({
+    const edges = slicedFriendships.map((friendship) => ({
       node: this.mapToFriendshipType(friendship),
       cursor: String(friendship._id),
     }));
 
     const endCursor = edges.length > 0 ? edges[edges.length - 1].cursor : null;
 
-    const pageInfo: PageInfo = {
+    const pageInfo = {
       endCursor,
       hasNextPage,
     };
@@ -297,9 +292,6 @@ export class FriendshipService {
       pageInfo,
     };
   }
-
-
-
 
   private mapToFriendshipType(friendship: FriendshipDocument): FriendshipType {
     return {

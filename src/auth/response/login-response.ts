@@ -1,10 +1,8 @@
 import { Field, ObjectType } from '@nestjs/graphql';
+import { GenericResponse } from './response';
 
 @ObjectType()
-export class LoginResponse {
-  @Field()
-  message: string;
-
+export class LoginResponse extends GenericResponse {
   @Field()
   accessToken: string;
 }

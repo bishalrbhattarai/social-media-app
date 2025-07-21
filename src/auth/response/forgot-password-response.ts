@@ -1,7 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
+import { GenericResponse } from './response';
 
 @ObjectType()
-export class ForgotPasswordResponse {
-  @Field()
-  message: string;
+export class ForgotPasswordResponse extends GenericResponse {
 }

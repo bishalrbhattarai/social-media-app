@@ -137,9 +137,9 @@ export interface PostType {
     isLikedByMe?: Nullable<boolean>;
 }
 
-export interface PostEdge {
-    node: PostType;
-    cursor: string;
+export interface CreatePostResponse {
+    message: string;
+    post: PostType;
 }
 
 export interface PageInfo {
@@ -147,14 +147,14 @@ export interface PageInfo {
     hasNextPage: boolean;
 }
 
+export interface PostEdge {
+    node: PostType;
+    cursor: string;
+}
+
 export interface PostConnection {
     edges: PostEdge[];
     pageInfo: PageInfo;
-}
-
-export interface CreatePostResponse {
-    message: string;
-    post: PostType;
 }
 
 export interface DeletePostResponse {
@@ -184,14 +184,9 @@ export interface FriendshipEdge {
     cursor: string;
 }
 
-export interface FriendshipPageInfo {
-    endCursor?: Nullable<string>;
-    hasNextPage: boolean;
-}
-
 export interface FriendshipConnection {
     edges: FriendshipEdge[];
-    pageInfo: FriendshipPageInfo;
+    pageInfo: PageInfo;
 }
 
 export interface ConversationParticipantType {

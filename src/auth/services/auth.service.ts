@@ -36,7 +36,10 @@ export class AuthService {
     private readonly forgortPasswordService: ForgotPasswordService,
   ) {}
 
-  async verifyResetPasswordToken(req: Request, newPassword: string) :Promise<VerifyResetPasswordTokenResponse>{
+  async verifyResetPasswordToken(
+    req: Request,
+    newPassword: string,
+  ): Promise<VerifyResetPasswordTokenResponse> {
     const token = req.headers['reset-password-token'];
     if (!token) throw new BadRequestException('Token is missing');
     const _id = await this.cacheService.get<string>(`forgot-password:${token}`);
@@ -58,9 +61,6 @@ export class AuthService {
   ): Promise<ForgotPasswordResponse> {
     const user = await this.userService.findOneByEmail(email);
     if (!user) throw new NotFoundException('User not found');
-
-    // if (user.isEmailVerified === false)
-    //   throw new BadRequestException('Email is not verified');
 
     const token = uuidv4();
     await this.cacheService.set(
@@ -158,6 +158,10 @@ export class AuthService {
       throw new BadRequestException('Refresh token not found');
     await this.cacheService.del(`refresh-token:${decoded.jti}`);
 
+    res.clearCookie('refresh_token', {
+      path: '/',
+    });
+
     return {
       message: 'Logged out successfully',
     };
@@ -206,7 +210,12 @@ export class AuthService {
     const user = await this.userService.findOneByEmail(input.email);
     if (!user) throw new NotFoundException('User not found');
 
-    await this.passwordService.comparePassword(input.password, user.password);
+    const isValid = await this.passwordService.comparePassword(
+      input.password,
+      user.password,
+    );
+
+    if (!isValid) throw new BadRequestException('Invalid credentials');
 
     const payload = {
       sub: user._id as string,

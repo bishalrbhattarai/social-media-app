@@ -4,9 +4,11 @@ import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { User } from 'src/auth/resolvers/auth.resolver';
+import { FriendshipConnection } from '../entities/friendship.connection';
 
 import { registerEnumType } from '@nestjs/graphql';
-import { FriendshipConnection, FriendshipType } from '../entities/friendship.entity';
+import {
+} from '../entities/friendship.entity';
 
 export enum FriendRequestAction {
   ACCEPT = 'accepted',
@@ -25,7 +27,7 @@ export class FriendshipResolver {
 
   @Mutation(() => String)
   async sendFriendRequest(
-    @Args('recipient') recipient: string,
+    @Args('recipient', { type: () => String }) recipient: string,
     @CurrentUser() user: User,
   ): Promise<string> {
     return this.friendshipService.sendFriendRequest(recipient, user);
@@ -68,9 +70,6 @@ export class FriendshipResolver {
     @Args('first', { type: () => Int, nullable: true }) first?: number,
     @Args('after', { nullable: true }) after?: string,
   ) {
-    return this.friendshipService.getFriendRequestsConnection(user, first, after);
+    return this.friendshipService.getFriendRequests(user, first, after);
   }
-
-
-
 }

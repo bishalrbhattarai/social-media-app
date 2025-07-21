@@ -46,29 +46,29 @@ export class FriendshipType {
   updatedAt: Date;
 }
 
-@ObjectType()
-export class FriendshipEdge {
-  @Field(() => FriendshipType)
-  node: FriendshipType;
+// @ObjectType()
+// export class FriendshipEdge {
+//   @Field(() => FriendshipType)
+//   node: FriendshipType;
 
-  @Field()
-  cursor: string;
-}
+//   @Field()
+//   cursor: string;
+// }
 
-@ObjectType('FriendshipPageInfo') 
-export class PageInfo {
-  @Field(() => String, { nullable: true })
-  endCursor?: string | null;
+// @ObjectType('FriendshipPageInfo') 
+// export class PageInfo {
+//   @Field(() => String, { nullable: true })
+//   endCursor?: string | null;
 
-  @Field()
-  hasNextPage: boolean;
-}
+//   @Field()
+//   hasNextPage: boolean;
+// }
 
-@ObjectType()
-export class FriendshipConnection {
-  @Field(() => [FriendshipEdge])
-  edges: FriendshipEdge[];
+// @ObjectType()
+// export class FriendshipConnection {
+//   @Field(() => [FriendshipEdge])
+//   edges: FriendshipEdge[];
 
-  @Field(() => PageInfo)
-  pageInfo: PageInfo;
-}
+//   @Field(() => PageInfo)
+//   pageInfo: PageInfo;
+// }

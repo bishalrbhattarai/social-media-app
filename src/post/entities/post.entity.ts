@@ -48,29 +48,4 @@ export class PostType {
 
 }
 
-@ObjectType()
-export class PostEdge {
-  @Field(() => PostType)
-  node: PostType;
 
-  @Field()
-  cursor: string;
-}
-
-@ObjectType()
-export class PageInfo {
-  @Field(() => String, { nullable: true })
-  endCursor?: string | null;
-
-  @Field()
-  hasNextPage: boolean;
-}
-
-@ObjectType()
-export class PostConnection {
-  @Field(() => [PostEdge])
-  edges: PostEdge[];
-
-  @Field(() => PageInfo)
-  pageInfo: PageInfo;
-}

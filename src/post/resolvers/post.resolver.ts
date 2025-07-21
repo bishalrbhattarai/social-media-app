@@ -6,7 +6,7 @@ import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { User } from 'src/auth/resolvers/auth.resolver';
-import { PostConnection } from '../entities/post.entity';
+import { PostConnection } from '../entities/post.connection';
 import { PaginationInput } from '../dtos/pagination.dto';
 import { DeletePostResponse } from '../response/delete-post.response';
 import { UpdatePostResponse } from '../response/update-post.response';

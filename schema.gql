@@ -72,9 +72,9 @@ type PostType {
   isLikedByMe: Boolean
 }
 
-type PostEdge {
-  node: PostType!
-  cursor: String!
+type CreatePostResponse {
+  message: String!
+  post: PostType!
 }
 
 type PageInfo {
@@ -82,14 +82,14 @@ type PageInfo {
   hasNextPage: Boolean!
 }
 
+type PostEdge {
+  node: PostType!
+  cursor: String!
+}
+
 type PostConnection {
   edges: [PostEdge!]!
   pageInfo: PageInfo!
-}
-
-type CreatePostResponse {
-  message: String!
-  post: PostType!
 }
 
 type DeletePostResponse {
@@ -132,14 +132,9 @@ type FriendshipEdge {
   cursor: String!
 }
 
-type FriendshipPageInfo {
-  endCursor: String
-  hasNextPage: Boolean!
-}
-
 type FriendshipConnection {
   edges: [FriendshipEdge!]!
-  pageInfo: FriendshipPageInfo!
+  pageInfo: PageInfo!
 }
 
 type ConversationParticipantType {
