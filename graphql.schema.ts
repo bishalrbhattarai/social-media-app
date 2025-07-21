@@ -166,6 +166,25 @@ export interface UpdatePostResponse {
     post: PostType;
 }
 
+export interface CommentType {
+    id: string;
+    postId: string;
+    authorId: string;
+    authorName: string;
+    content: string;
+    parentCommentId?: Nullable<string>;
+}
+
+export interface CommentEdge {
+    node: CommentType;
+    cursor: string;
+}
+
+export interface CommentConnection {
+    edges: CommentEdge[];
+    pageInfo: PageInfo;
+}
+
 export interface FriendshipType {
     id: string;
     requester: string;
@@ -245,6 +264,7 @@ export interface IQuery {
     myProfile(): UserType | Promise<UserType>;
     posts(input?: Nullable<PaginationInput>): PostConnection | Promise<PostConnection>;
     myPosts(input?: Nullable<PaginationInput>): PostConnection | Promise<PostConnection>;
+    getComments(postId: string, input: PaginationInput): CommentConnection | Promise<CommentConnection>;
     myFriends(first?: Nullable<number>, after?: Nullable<string>): FriendshipConnection | Promise<FriendshipConnection>;
     myFriendRequests(first?: Nullable<number>, after?: Nullable<string>): FriendshipConnection | Promise<FriendshipConnection>;
     getMessages(conversationId: string, first?: Nullable<number>, after?: Nullable<string>): MessageConnection | Promise<MessageConnection>;

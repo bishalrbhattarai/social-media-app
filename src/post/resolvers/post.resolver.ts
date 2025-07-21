@@ -7,9 +7,9 @@ import { AuthGuard } from 'src/common/guards/auth.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { User } from 'src/auth/resolvers/auth.resolver';
 import { PostConnection } from '../entities/post.connection';
-import { PaginationInput } from '../dtos/pagination.dto';
 import { DeletePostResponse } from '../response/delete-post.response';
 import { UpdatePostResponse } from '../response/update-post.response';
+import { PaginationInput } from 'src/common/dtos/pagination-input.dto';
 
 @Resolver()
 @UseGuards(AuthGuard)

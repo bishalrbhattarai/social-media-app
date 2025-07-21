@@ -3,20 +3,20 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { PostRepository } from '../repositories/post.repository';
 import { CreatePostInput, UpdatePostInput } from '../dtos/post.dto';
 import { User } from 'src/auth/resolvers/auth.resolver';
 import mongoose, { UpdateQuery } from 'mongoose';
 import { UserService } from 'src/user/services/user.service';
 import { CreatePostResponse } from '../response/create-post.response';
 import { toPostType } from '../mappers/post.mapper';
-import { PaginationInput } from '../dtos/pagination.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { PostDocument } from '../entities/post.schema';
 import { LikeService } from 'src/like/services/like.service';
 import { UpdatePostResponse } from '../response/update-post.response';
 import { DeletePostJobService } from 'src/job/delete-post.service';
 import { PostConnection } from '../entities/post.connection';
+import { PaginationInput } from 'src/common/dtos/pagination-input.dto';
+import { PostRepository } from '../repositories/post.repository';
 
 @Injectable()
 export class PostService {
@@ -111,7 +111,6 @@ export class PostService {
     const likedPostIds = new Set(
       likedDocs.map((like) => like.postId.toString()),
     );
-    console.log(likedPostIds);
 
     const edges = slicedPosts.map((post) => ({
       node: {

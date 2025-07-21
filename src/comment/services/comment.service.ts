@@ -9,6 +9,10 @@ import { UserService } from 'src/user/services/user.service';
 import { UpdateCommentService } from 'src/job/update-comment.service';
 import { PostService } from 'src/post/services/post.service';
 import mongoose from 'mongoose';
+import { PaginationInput } from 'src/common/dtos/pagination-input.dto';
+import { CommentDocument } from '../entities/comment.schema';
+import { commentTypeMapper } from '../mappers/comment-type.mapper';
+import { CommentConnection } from '../entities/comment.connection';
 
 @Injectable()
 export class CommentService {
@@ -18,6 +22,43 @@ export class CommentService {
     private readonly updateCommentService: UpdateCommentService,
     private readonly postService: PostService,
   ) {}
+
+  async getComments(
+    postId: string,
+    input: PaginationInput = { first: 10 },
+  ): Promise<CommentConnection> {
+    const filter: Record<string, any> = { postId, parentCommentId: null };
+    if (input.search) {
+      filter.content = { $regex: input.search, $options: 'i' };
+    }
+
+    const first = input.first;
+    const limit = first + 1;
+
+    const commentDocuments = await this.commentRepository.find(filter, {
+      first: limit,
+      after: input.after,
+      sort: { _id: -1 },
+    });
+
+    const hasNextPage = commentDocuments.length > first;
+    const sliced = commentDocuments.slice(0, first);
+
+    const edges = sliced.map((doc: CommentDocument) => ({
+      node: commentTypeMapper(doc),
+      cursor: String(doc._id),
+    }));
+
+    const endCursor = edges.length > 0 ? edges[edges.length - 1].cursor : null;
+
+    return {
+      edges,
+      pageInfo: {
+        hasNextPage,
+        endCursor,
+      },
+    };
+  }
 
   async deleteMany(postId: string) {
     await this.commentRepository.deleteMany({
@@ -71,7 +112,7 @@ export class CommentService {
 
     if (!comment) throw new NotFoundException('Comment not found');
 
-    if (comment.authorId.toString() !== user._id)
+    if (comment.authorId !== user._id)
       throw new UnauthorizedException('You can only delete your own comments');
 
     await this.commentRepository.delete({

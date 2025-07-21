@@ -1,27 +1,22 @@
-import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
 
-@Schema({ timestamps: true })
-export class Comment {
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Post', required: true })
-  postId: string; 
+@ObjectType()
+export class CommentType {
+  @Field(() => ID)
+  id: string;
 
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true })
-  authorId: string; 
+  @Field(() => ID)
+  postId: string;
 
-  @Prop({ required: true })
+  @Field(() => ID)
+  authorId: string;
+
+  @Field()
   authorName: string;
 
-  @Prop({ required: true })
+  @Field()
   content: string;
 
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Comment', default: null })
+  @Field(() => ID, { nullable: true })
   parentCommentId?: string | null;
 }
-
-export const CommentSchema = SchemaFactory.createForClass(Comment);
-
-export type CommentDocument = Comment & Document;
-
-CommentSchema.index({ postId: 1, parentCommentId: 1, createdAt: 1 });
-CommentSchema.index({ authorId: 1 });

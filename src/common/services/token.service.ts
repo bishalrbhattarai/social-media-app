@@ -32,7 +32,7 @@ export class TokenService {
   generateAccessToken(payload: JwtPayload) {
     const accessTokenJti = uuidv4();
     const token = this.jwtService.sign(payload, {
-      expiresIn: '30m',
+      expiresIn: '5h',
       secret: 'your-access-token-secret',
       jwtid: accessTokenJti,
     });

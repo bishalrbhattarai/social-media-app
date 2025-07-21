@@ -101,6 +101,25 @@ type UpdatePostResponse {
   post: PostType!
 }
 
+type CommentType {
+  id: ID!
+  postId: ID!
+  authorId: ID!
+  authorName: String!
+  content: String!
+  parentCommentId: ID
+}
+
+type CommentEdge {
+  node: CommentType!
+  cursor: String!
+}
+
+type CommentConnection {
+  edges: [CommentEdge!]!
+  pageInfo: PageInfo!
+}
+
 type FriendshipType {
   id: ID!
   requester: ID!
@@ -193,13 +212,14 @@ type Query {
   myProfile: UserType!
   posts(input: PaginationInput = {first: 5}): PostConnection!
   myPosts(input: PaginationInput = {first: 5}): PostConnection!
+  getComments(postId: String!, input: PaginationInput!): CommentConnection!
   myFriends(first: Int, after: String): FriendshipConnection!
   myFriendRequests(first: Int, after: String): FriendshipConnection!
   getMessages(conversationId: String!, first: Float = 10, after: String): MessageConnection!
 }
 
 input PaginationInput {
-  first: Float = 5
+  first: Float = 10
   after: String
   search: String
 }
