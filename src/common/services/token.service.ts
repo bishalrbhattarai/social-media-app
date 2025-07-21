@@ -32,7 +32,7 @@ export class TokenService {
   generateAccessToken(payload: JwtPayload) {
     const accessTokenJti = uuidv4();
     const token = this.jwtService.sign(payload, {
-      expiresIn: '5h',
+      expiresIn: '2m',
       secret: 'your-access-token-secret',
       jwtid: accessTokenJti,
     });
@@ -54,7 +54,7 @@ export class TokenService {
   generateRefreshToken(payload: JwtPayload) {
     const refreshTokenJti = uuidv4();
     const token = this.jwtService.sign(payload, {
-      expiresIn: '7d',
+      expiresIn: '15m',
       secret: 'your-refresh-token-secret',
       jwtid: refreshTokenJti,
     });
