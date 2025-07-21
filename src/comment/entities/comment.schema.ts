@@ -15,6 +15,10 @@ export class Comment {
   @Prop({ required: true })
   content: string;
 
+  @Prop({required:false,default:""})
+  parentContent: string;
+
+
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Comment', default: null })
   parentCommentId?: string | null;
 }

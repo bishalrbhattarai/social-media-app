@@ -173,6 +173,7 @@ export interface CommentType {
     authorName: string;
     content: string;
     parentCommentId?: Nullable<string>;
+    parentContent?: Nullable<string>;
 }
 
 export interface CommentEdge {
@@ -265,6 +266,7 @@ export interface IQuery {
     posts(input?: Nullable<PaginationInput>): PostConnection | Promise<PostConnection>;
     myPosts(input?: Nullable<PaginationInput>): PostConnection | Promise<PostConnection>;
     getComments(postId: string, input: PaginationInput): CommentConnection | Promise<CommentConnection>;
+    getReplies(commentId: string, input: PaginationInput): CommentConnection | Promise<CommentConnection>;
     myFriends(first?: Nullable<number>, after?: Nullable<string>): FriendshipConnection | Promise<FriendshipConnection>;
     myFriendRequests(first?: Nullable<number>, after?: Nullable<string>): FriendshipConnection | Promise<FriendshipConnection>;
     getMessages(conversationId: string, first?: Nullable<number>, after?: Nullable<string>): MessageConnection | Promise<MessageConnection>;

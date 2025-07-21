@@ -8,6 +8,9 @@ export function commentTypeMapper(document: CommentDocument): CommentType {
     authorId: document.authorId.toString(),
     authorName: document.authorName,
     content: document.content,
-    parentCommentId: document.parentCommentId? document.parentCommentId.toString(): null,
+    parentCommentId: document.parentCommentId
+      ? document.parentCommentId.toString()
+      : null,
+    parentContent: document.parentContent || '',
   };
 }

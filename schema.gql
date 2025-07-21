@@ -108,6 +108,7 @@ type CommentType {
   authorName: String!
   content: String!
   parentCommentId: ID
+  parentContent: String
 }
 
 type CommentEdge {
@@ -213,6 +214,7 @@ type Query {
   posts(input: PaginationInput = {first: 5}): PostConnection!
   myPosts(input: PaginationInput = {first: 5}): PostConnection!
   getComments(postId: String!, input: PaginationInput!): CommentConnection!
+  getReplies(commentId: String!, input: PaginationInput!): CommentConnection!
   myFriends(first: Int, after: String): FriendshipConnection!
   myFriendRequests(first: Int, after: String): FriendshipConnection!
   getMessages(conversationId: String!, first: Float = 10, after: String): MessageConnection!

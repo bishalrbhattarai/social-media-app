@@ -19,4 +19,7 @@ export class CommentType {
 
   @Field(() => ID, { nullable: true })
   parentCommentId?: string | null;
+
+  @Field(()=>String,{ nullable: true ,defaultValue:"" })
+  parentContent?: string | null;
 }

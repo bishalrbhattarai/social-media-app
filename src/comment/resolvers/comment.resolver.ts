@@ -41,9 +41,17 @@ export class CommentResolver {
 
   @Query(() => CommentConnection)
   getComments(
-    @Args('postId') postId: string,
+    @Args('postId', { type: () => String }) postId: string,
     @Args('input') input: PaginationInput = { first: 10 },
   ): Promise<CommentConnection> {
     return this.commentService.getComments(postId, input);
+  }
+
+  @Query(() => CommentConnection)
+  async getReplies(
+    @Args('commentId', { type: () => String }) commentId: string,
+    @Args('input') input: PaginationInput = { first: 10 },
+  ) {
+    return this.commentService.getReplies(commentId,input)
   }
 }

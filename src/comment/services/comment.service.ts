@@ -23,6 +23,39 @@ export class CommentService {
     private readonly postService: PostService,
   ) {}
 
+  async getReplies(commentId: string, input: PaginationInput = { first: 10 }) {
+    const filter: Record<string, any> = { parentCommentId: commentId };
+    if (input.search) filter.content = { $regex: input.search, $options: 'i' };
+
+    const first = input.first;
+    const limit = first + 1;
+
+    const replyDocuments = await this.commentRepository.find(filter, {
+      first: limit,
+      after: input.after,
+      sort: { _id: -1 },
+    });
+
+
+    const hasNextPage = replyDocuments.length > first;
+    const sliced = replyDocuments.slice(0, first);
+
+    const edges = sliced.map((doc: CommentDocument) => ({
+      node: commentTypeMapper(doc),
+      cursor: String(doc._id),
+    }));
+
+    const endCursor = edges.length > 0 ? edges[edges.length - 1].cursor : null;
+
+    return {
+      edges,
+      pageInfo: {
+        hasNextPage,
+        endCursor,
+      },
+    };
+  }
+
   async getComments(
     postId: string,
     input: PaginationInput = { first: 10 },
