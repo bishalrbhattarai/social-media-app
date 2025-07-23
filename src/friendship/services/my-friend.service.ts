@@ -16,4 +16,15 @@ export class MyFriendService {
       },
     );
   }
+
+  async removeFromFriendsList(id: string, requestedId: string): Promise<void> {
+    await this.myFriendRepository.updateOneByFilter(
+      {
+        userId: id,
+      },
+      {
+        $pull: { friends: requestedId },
+      },
+    );
+  }
 }

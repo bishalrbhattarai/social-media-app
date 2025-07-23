@@ -23,7 +23,7 @@ export class FriendshipService {
     private readonly friendshipRepository: FriendshipRepository,
     private readonly myFriendService: MyFriendService,
     private readonly userService: UserService,
-    private readonly myFriendRepository: MyFriendRepository
+    private readonly myFriendRepository: MyFriendRepository,
   ) {}
 
   async sendFriendRequest(recipientId: string, user: User): Promise<string> {
@@ -183,6 +183,7 @@ export class FriendshipService {
         { requester: currentUser._id, recipient: friendId },
         { requester: friendId, recipient: currentUser._id },
       ],
+      status: FriendshipStatus.Accepted,
     });
 
     if (!friendship) {
@@ -196,6 +197,11 @@ export class FriendshipService {
         `Cannot remove a user who is not currently your friend.`,
       );
     }
+
+    // Remove from both users' friends lists
+    await this.myFriendService.removeFromFriendsList(currentUser._id, friendId);
+
+    await this.myFriendService.removeFromFriendsList(friendId, currentUser._id);
 
     await this.friendshipRepository.delete({
       _id: friendship._id,
@@ -239,18 +245,26 @@ export class FriendshipService {
     const slicedFriendships = friendships.slice(0, first);
 
     const otherUserIds = slicedFriendships.map((f) =>
-      f.requester.toString() === userId ? f.recipient.toString() : f.requester.toString(),
+      f.requester.toString() === userId
+        ? f.recipient.toString()
+        : f.requester.toString(),
     );
-  
-    const currentUserFriendDoc = await this.myFriendRepository.findOne({ userId: user._id });
-    const currentUserFriends: string[] = currentUserFriendDoc?.friends.map(String) || [];
+
+    const currentUserFriendDoc = await this.myFriendRepository.findOne({
+      userId: user._id,
+    });
+    const currentUserFriends: string[] =
+      currentUserFriendDoc?.friends.map(String) || [];
 
     console.log(`Current User Friends:`);
     console.log(currentUserFriends);
 
-  
     const mutuals = await this.myFriendRepository.aggregate([
-      { $match: { userId: { $in: otherUserIds.map(id => new Types.ObjectId(id)) } } },
+      {
+        $match: {
+          userId: { $in: otherUserIds.map((id) => new Types.ObjectId(id)) },
+        },
+      },
       {
         $addFields: {
           mutualCount: {
@@ -265,16 +279,17 @@ export class FriendshipService {
         },
       },
     ]);
-    console.log(mutuals);
-  
-    const mutualMap = new Map(mutuals.map(m => [m.userId.toString(), m.mutualCount]));
-  
+
+    const mutualMap = new Map(
+      mutuals.map((m) => [m.userId.toString(), m.mutualCount]),
+    );
+
     const edges = slicedFriendships.map((friendship) => {
       const friendId =
         friendship.requester.toString() === userId
           ? friendship.recipient.toString()
           : friendship.requester.toString();
-  
+
       return {
         node: {
           ...this.mapToFriendshipType(friendship),
@@ -283,9 +298,9 @@ export class FriendshipService {
         cursor: String(friendship._id),
       };
     });
-  
+
     const endCursor = edges.length > 0 ? edges[edges.length - 1].cursor : null;
-  
+
     return {
       edges,
       pageInfo: {
@@ -295,9 +310,6 @@ export class FriendshipService {
     };
   }
 
-
-
-  
   async getFriendRequests(
     user: User,
     first = 10,
@@ -329,9 +341,8 @@ export class FriendshipService {
     const hasNextPage = friendships.length > first;
 
     const slicedFriendships = friendships.slice(0, first);
-  
-    const edges = slicedFriendships.map((friendship) => {
 
+    const edges = slicedFriendships.map((friendship) => {
       return {
         node: {
           ...this.mapToFriendshipType(friendship),
@@ -339,9 +350,9 @@ export class FriendshipService {
         cursor: String(friendship._id),
       };
     });
-  
+
     const endCursor = edges.length > 0 ? edges[edges.length - 1].cursor : null;
-  
+
     return {
       edges,
       pageInfo: {
