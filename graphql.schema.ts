@@ -194,6 +194,7 @@ export interface FriendshipType {
     recipientName: string;
     requesterAvatar?: Nullable<string>;
     recipientAvatar?: Nullable<string>;
+    mutualCount?: Nullable<number>;
     status: FriendshipStatus;
     createdAt: DateTime;
     updatedAt: DateTime;

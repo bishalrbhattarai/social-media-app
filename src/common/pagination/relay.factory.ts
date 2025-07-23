@@ -23,5 +23,3 @@ export function ConnectionType<T>(classRef: Type<T>, name: string) {
 
   return ConnectionTypeClass;
 }
-
-// interface A & Omit<Type,"A"> {}   

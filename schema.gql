@@ -129,6 +129,7 @@ type FriendshipType {
   recipientName: String!
   requesterAvatar: String
   recipientAvatar: String
+  mutualCount: Int
   status: FriendshipStatus!
   createdAt: DateTime!
   updatedAt: DateTime!

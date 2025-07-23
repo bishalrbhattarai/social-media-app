@@ -6,6 +6,8 @@ import { Friendship, FriendshipSchema } from './entities/friendship.schema';
 import { FriendshipRepository } from './repositories/friendship.repository';
 import { UserModule } from 'src/user/user.module';
 import { MyFriend, MyFriendSchema } from './entities/my-friend.schema';
+import { MyFriendRepository } from './repositories/my-friend.repository';
+import { MyFriendService } from './services/my-friend.service';
 
 @Module({
   imports: [
@@ -15,6 +17,12 @@ import { MyFriend, MyFriendSchema } from './entities/my-friend.schema';
       { name: MyFriend.name, schema: MyFriendSchema },
     ]),
   ],
-  providers: [FriendshipResolver, FriendshipService, FriendshipRepository],
+  providers: [
+    FriendshipResolver,
+    FriendshipService,
+    FriendshipRepository,
+    MyFriendRepository,
+    MyFriendService,
+  ],
 })
 export class FriendshipModule {}

@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, SchemaTypes } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class MyFriend {
-  @Prop({ unique: true })
+  @Prop({ type:SchemaTypes.ObjectId, unique: true })
   userId: string;
 
   @Prop({ type: [String] })

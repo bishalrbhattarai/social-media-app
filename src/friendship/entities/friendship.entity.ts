@@ -1,4 +1,4 @@
-import { ObjectType, Field, ID, registerEnumType } from '@nestjs/graphql';
+import { ObjectType, Field, ID, registerEnumType, Int } from '@nestjs/graphql';
 
 export enum FriendshipStatus {
   Pending = 'pending',
@@ -35,6 +35,8 @@ export class FriendshipType {
   @Field({ nullable: true })
   recipientAvatar?: string;
 
+  @Field(()=>Int,{nullable:true,defaultValue:0})
+  mutualCount?:number
 
   @Field(() => FriendshipStatus)
   status: FriendshipStatus;

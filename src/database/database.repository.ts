@@ -1,6 +1,7 @@
 import {
   FilterQuery,
   Model,
+  PipelineStage,
   ProjectionFields,
   SortOrder,
   Types,
@@ -19,9 +20,22 @@ export abstract class DatabaseRepository<T> {
   async updateOne(
     filter: FilterQuery<T>,
     update: UpdateQuery<T>,
-    options = { new: true },
+    options = { upsert: true, new: true },
   ) {
     return this.model.findByIdAndUpdate(filter, update, options);
+  }
+
+
+  async aggregate(pipeline: PipelineStage[]): Promise<any[]> {
+    return this.model.aggregate(pipeline).exec();
+  }
+
+  async updateOneByFilter(
+    filter: FilterQuery<T>,
+    update: UpdateQuery<T>,
+    options = { upsert: true, new: true },
+  ) {
+    return this.model.findOneAndUpdate(filter, update, options);
   }
 
   async findOne(
@@ -40,9 +54,8 @@ export abstract class DatabaseRepository<T> {
   }
 
   async deleteMany(filter: FilterQuery<T>) {
-     return this.model.deleteMany(filter).exec();
+    return this.model.deleteMany(filter).exec();
   }
-
 
   async find(
     filter: FilterQuery<T> = {},

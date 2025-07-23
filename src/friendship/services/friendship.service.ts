@@ -14,12 +14,16 @@ import { FriendRequestAction } from '../resolvers/friendship.resolver';
 import { Types } from 'mongoose';
 import { FriendshipType } from '../entities/friendship.entity';
 import { FriendshipConnection } from '../entities/friendship.connection';
+import { MyFriendService } from './my-friend.service';
+import { MyFriendRepository } from '../repositories/my-friend.repository';
 
 @Injectable()
 export class FriendshipService {
   constructor(
     private readonly friendshipRepository: FriendshipRepository,
+    private readonly myFriendService: MyFriendService,
     private readonly userService: UserService,
+    private readonly myFriendRepository: MyFriendRepository
   ) {}
 
   async sendFriendRequest(recipientId: string, user: User): Promise<string> {
@@ -148,6 +152,15 @@ export class FriendshipService {
       case FriendRequestAction.ACCEPT:
         friendship.status = FriendshipStatus.Accepted;
         await friendship.save();
+
+        await this.myFriendService.addtoFriendsList(
+          currentUser._id,
+          requesterId,
+        );
+        await this.myFriendService.addtoFriendsList(
+          requesterId,
+          currentUser._id,
+        );
         return `Friend request from ${requesterId} accepted.`;
 
       case FriendRequestAction.DECLINE:
@@ -225,24 +238,66 @@ export class FriendshipService {
 
     const slicedFriendships = friendships.slice(0, first);
 
-    const edges = slicedFriendships.map((friendship) => ({
-      node: this.mapToFriendshipType(friendship),
-      cursor: String(friendship._id),
-    }));
+    const otherUserIds = slicedFriendships.map((f) =>
+      f.requester.toString() === userId ? f.recipient.toString() : f.requester.toString(),
+    );
+  
+    const currentUserFriendDoc = await this.myFriendRepository.findOne({ userId: user._id });
+    const currentUserFriends: string[] = currentUserFriendDoc?.friends.map(String) || [];
 
+    console.log(`Current User Friends:`);
+    console.log(currentUserFriends);
+
+  
+    const mutuals = await this.myFriendRepository.aggregate([
+      { $match: { userId: { $in: otherUserIds.map(id => new Types.ObjectId(id)) } } },
+      {
+        $addFields: {
+          mutualCount: {
+            $size: { $setIntersection: ['$friends', currentUserFriends] },
+          },
+        },
+      },
+      {
+        $project: {
+          userId: 1,
+          mutualCount: 1,
+        },
+      },
+    ]);
+    console.log(mutuals);
+  
+    const mutualMap = new Map(mutuals.map(m => [m.userId.toString(), m.mutualCount]));
+  
+    const edges = slicedFriendships.map((friendship) => {
+      const friendId =
+        friendship.requester.toString() === userId
+          ? friendship.recipient.toString()
+          : friendship.requester.toString();
+  
+      return {
+        node: {
+          ...this.mapToFriendshipType(friendship),
+          mutualCount: mutualMap.get(friendId) || 0,
+        },
+        cursor: String(friendship._id),
+      };
+    });
+  
     const endCursor = edges.length > 0 ? edges[edges.length - 1].cursor : null;
-
-    const pageInfo = {
-      endCursor,
-      hasNextPage,
-    };
-
+  
     return {
       edges,
-      pageInfo,
+      pageInfo: {
+        endCursor,
+        hasNextPage,
+      },
     };
   }
 
+
+
+  
   async getFriendRequests(
     user: User,
     first = 10,
@@ -274,22 +329,25 @@ export class FriendshipService {
     const hasNextPage = friendships.length > first;
 
     const slicedFriendships = friendships.slice(0, first);
+  
+    const edges = slicedFriendships.map((friendship) => {
 
-    const edges = slicedFriendships.map((friendship) => ({
-      node: this.mapToFriendshipType(friendship),
-      cursor: String(friendship._id),
-    }));
-
+      return {
+        node: {
+          ...this.mapToFriendshipType(friendship),
+        },
+        cursor: String(friendship._id),
+      };
+    });
+  
     const endCursor = edges.length > 0 ? edges[edges.length - 1].cursor : null;
-
-    const pageInfo = {
-      endCursor,
-      hasNextPage,
-    };
-
+  
     return {
       edges,
-      pageInfo,
+      pageInfo: {
+        endCursor,
+        hasNextPage,
+      },
     };
   }
 
