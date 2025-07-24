@@ -158,6 +158,23 @@ type FriendshipConnection {
   pageInfo: PageInfo!
 }
 
+type FriendSuggestionType {
+  userId: ID!
+  name: String!
+  avatar: String
+  mutualCount: Int!
+}
+
+type FriendSuggestionEdge {
+  node: FriendSuggestionType!
+  cursor: String!
+}
+
+type FriendSuggestionConnection {
+  edges: [FriendSuggestionEdge!]!
+  pageInfo: PageInfo!
+}
+
 type ConversationParticipantType {
   userId: ID!
   name: String!
@@ -218,6 +235,7 @@ type Query {
   getReplies(commentId: String!, input: PaginationInput!): CommentConnection!
   myFriends(first: Int, after: String): FriendshipConnection!
   myFriendRequests(first: Int, after: String): FriendshipConnection!
+  myFriendSuggestions(first: Int, after: String): FriendSuggestionConnection!
   getMessages(conversationId: String!, first: Float = 10, after: String): MessageConnection!
 }
 

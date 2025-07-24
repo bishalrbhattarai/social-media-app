@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { MyFriendRepository } from '../repositories/my-friend.repository';
-import { User } from 'src/auth/resolvers/auth.resolver';
 
 @Injectable()
 export class MyFriendService {

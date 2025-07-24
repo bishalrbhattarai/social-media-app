@@ -7,8 +7,8 @@ import { User } from 'src/auth/resolvers/auth.resolver';
 import { FriendshipConnection } from '../entities/friendship.connection';
 
 import { registerEnumType } from '@nestjs/graphql';
-import {
-} from '../entities/friendship.entity';
+import {} from '../entities/friendship.entity';
+import { FriendSuggestionConnection } from '../entities/friend-suggestion.connection';
 
 export enum FriendRequestAction {
   ACCEPT = 'accepted',
@@ -71,5 +71,13 @@ export class FriendshipResolver {
     @Args('after', { nullable: true }) after?: string,
   ) {
     return this.friendshipService.getFriendRequests(user, first, after);
+  }
+@Query(() => FriendSuggestionConnection)
+  async myFriendSuggestions(
+    @CurrentUser() user: User,
+    @Args('first', { type: () => Int, nullable: true }) first?: number,
+    @Args('after', { nullable: true }) after?: string,
+  ) {
+    return this.friendshipService.getFriendsSuggestion(user, first, after);
   }
 }

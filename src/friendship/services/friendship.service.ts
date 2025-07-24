@@ -16,6 +16,7 @@ import { FriendshipType } from '../entities/friendship.entity';
 import { FriendshipConnection } from '../entities/friendship.connection';
 import { MyFriendService } from './my-friend.service';
 import { MyFriendRepository } from '../repositories/my-friend.repository';
+import { FriendSuggestionConnection } from '../entities/friend-suggestion.connection';
 
 @Injectable()
 export class FriendshipService {
@@ -26,6 +27,92 @@ export class FriendshipService {
     private readonly myFriendRepository: MyFriendRepository,
   ) {}
 
+  async getFriendsSuggestion(
+    user: User,
+    first = 10,
+    after?: string,
+  ): Promise<FriendSuggestionConnection> {
+    const currentUserId = new Types.ObjectId(user._id);
+  
+    const myDoc = await this.myFriendRepository.findOne({ userId: currentUserId });
+  
+    const myFriendsObjIds: Types.ObjectId[] = (myDoc?.friends || []).map(
+      (f: string) => new Types.ObjectId(f),
+    );
+  
+    const baseMatch = {
+      userId: { $ne: currentUserId, $nin: myFriendsObjIds },
+    };
+  
+    const cursorFilter = after
+      ? { _id: { $gt: new Types.ObjectId(after) } }
+      : {};
+  
+    const matchStage: any = { $match: { ...baseMatch, ...cursorFilter } };
+  
+    const pipeline: any[] = [
+      matchStage,
+      {
+        $addFields: {
+          mutualCount: {
+            $size: { $setIntersection: ['$friends', myDoc?.friends || []] },
+          },
+        },
+      },
+      {
+        $match: {
+          mutualCount: { $gt: 0 },
+        },
+      },
+      { $sort: { _id: 1 } },
+      { $limit: first + 1 },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'userInfo',
+        },
+      },
+      { $unwind: { path: '$userInfo', preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          _id: 1,
+          userId: 1,
+          mutualCount: 1,
+          name: '$userInfo.name',
+          avatar: '$userInfo.avatar',
+        },
+      },
+    ];
+  
+    const results = await this.myFriendRepository.aggregate(pipeline);
+  
+    const hasNextPage = results.length > first;
+    const sliced = results.slice(0, first);
+  
+    const edges = sliced.map((item: any) => ({
+      node: {
+        userId: item.userId.toString(),
+        name: item.name || '',
+        avatar: item.avatar || '',
+        mutualCount: item.mutualCount,
+      },
+      cursor: item._id.toString(),
+    }));
+  
+    const endCursor = edges.length > 0 ? edges[edges.length - 1].cursor : null;
+  
+    return {
+      edges,
+      pageInfo: {
+        endCursor,
+        hasNextPage,
+      },
+    };
+  }
+  
+  
   async sendFriendRequest(recipientId: string, user: User): Promise<string> {
     if (recipientId === user._id) {
       throw new BadRequestException(
@@ -83,6 +170,7 @@ export class FriendshipService {
 
     return `Friend request sent to user with ID: ${recipientId}`;
   }
+
 
   private async handleExisting(
     record: FriendshipDocument,

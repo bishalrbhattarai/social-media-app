@@ -210,6 +210,23 @@ export interface FriendshipConnection {
     pageInfo: PageInfo;
 }
 
+export interface FriendSuggestionType {
+    userId: string;
+    name: string;
+    avatar?: Nullable<string>;
+    mutualCount: number;
+}
+
+export interface FriendSuggestionEdge {
+    node: FriendSuggestionType;
+    cursor: string;
+}
+
+export interface FriendSuggestionConnection {
+    edges: FriendSuggestionEdge[];
+    pageInfo: PageInfo;
+}
+
 export interface ConversationParticipantType {
     userId: string;
     name: string;
@@ -270,6 +287,7 @@ export interface IQuery {
     getReplies(commentId: string, input: PaginationInput): CommentConnection | Promise<CommentConnection>;
     myFriends(first?: Nullable<number>, after?: Nullable<string>): FriendshipConnection | Promise<FriendshipConnection>;
     myFriendRequests(first?: Nullable<number>, after?: Nullable<string>): FriendshipConnection | Promise<FriendshipConnection>;
+    myFriendSuggestions(first?: Nullable<number>, after?: Nullable<string>): FriendSuggestionConnection | Promise<FriendSuggestionConnection>;
     getMessages(conversationId: string, first?: Nullable<number>, after?: Nullable<string>): MessageConnection | Promise<MessageConnection>;
 }
 
